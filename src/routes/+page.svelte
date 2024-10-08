@@ -1,66 +1,65 @@
 <script lang="ts">
-
     import { fight, init, newRound } from "$lib";
 
-    let state: any = {
+    enum GameState {
+        NOT_INITIATED = 'not_initiated',
+        INITIALIZED = 'initialized',
+        ROUND_STARTED = 'round_started',
+        ROUND_PLAYED = 'round_played',
+        PLAYER_WON = 'player_won',
+        PLAYER_LOST = 'player_lost'
+    }
+
+    let state = {
         playerMaxHealth: null,
         playerCurrentHealth: null,
         enemyMaxHealth: null,
         enemyCurrentHealth: null,
         playerWeapon: null,
         enemyWeapon: null,
-        hasInit: false,
-        hasRound: false,
-        hasFought: false,
-        playerWon: false,
-        playerLost: false
+        gameStatus: GameState.NOT_INITIATED
     };
 
     function triggerInit() {
-        state = init();
+        const initialState = init();
+        state = {
+            ...initialState,
+            gameStatus: GameState.INITIALIZED
+        };
     }
 
     function triggerNewRound() {
-        let response = null;
-        try {        
-            response = newRound(state.hasInit);
-        } catch (error) {
-            console.error(error);
-        }
-
-        if(response !== null) {
-            state.playerWeapon = response.playerWeapon;
-            state.enemyWeapon = response.enemyWeapon;
-            state.hasRound = response.hasRound;
-            state.hasFought = response.hasFought;
-        }
-
-    }
+    const response = newRound();
+    state.playerWeapon = response.playerWeapon;
+    state.enemyWeapon = response.enemyWeapon;
+    state = {
+            gameStatus: GameState.ROUND_STARTED
+        };
+}
 
     function triggerFight() {
-        let response = null;
+        const response = fight(
+            state.playerCurrentHealth,
+            state.enemyCurrentHealth,
+            state.playerWeapon,
+        );
+        
+        state.playerCurrentHealth = response.playerHealth;
+        state.enemyCurrentHealth = response.enemyHealth;
+        state.enemyWeapon = response.enemyWeapon;
 
-        try {        
-            response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
-        } catch (error) {
-            console.error(error);
-        }
-
-        if(response !== null) {
-            state.playerCurrentHealth = response[0];
-            state.enemyCurrentHealth = response[1];
-            state.enemyWeapon = response[2];
-            state.hasFought = response[3];
-            state.playerWon = response[4];
-            state.playerLost = response[5];
+        if (response.hasWon) {
+            state.gameStatus = GameState.PLAYER_WON;
+        } else if (response.hasLost) {
+            state.gameStatus = GameState.PLAYER_LOST;
+        } else {
+            state.gameStatus = GameState.ROUND_PLAYED; // Set to ROUND_PLAYED
         }
     }
-
 </script>
 
-
 <section id="player" class="w-1/3">
-    {#if state.hasInit === true}
+    {#if state.gameStatus === GameState.INITIALIZED || state.gameStatus === GameState.ROUND_STARTED || state.gameStatus === GameState.ROUND_PLAYED}
         <div class="flex flex-row items-center justify-between flex-wrap w-full">
             <div class="flex flex-col items-center justify-center w-full">
                 <h1 class="text-2xl font-bold">Player</h1>
@@ -73,31 +72,23 @@
 </section>
 
 <section id="action">
-    {#if state.hasInit === false}
+    {#if state.gameStatus === GameState.NOT_INITIATED}
         <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Start</button>
-    {:else}
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === false)}
-            <button class="btn btn-xl variant-filled-warning" on:click={triggerNewRound}>Next Round</button>
-        {/if}
-
-        {#if (state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false)}
-            <button class="btn btn-xl variant-filled-error" on:click={triggerFight}>Fight</button>
-        {/if}
-
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === true && state.playerLost === false)}
-            <p class="p">You won !</p>
-            <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
-        {/if}
-
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === true)}
-            <p class="p">You lost ...</p>
-            <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
-        {/if}
+    {:else if state.gameStatus === GameState.INITIALIZED}
+        <button class="btn btn-xl variant-filled-error" on:click={triggerFight}>Fight</button>
+    {:else if state.gameStatus === GameState.ROUND_PLAYED}
+        <button class="btn btn-xl variant-filled-warning" on:click={triggerNewRound}>Next Round</button>
+    {:else if state.gameStatus === GameState.PLAYER_WON}
+        <p class="p">You won!</p>
+        <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
+    {:else if state.gameStatus === GameState.PLAYER_LOST}
+        <p class="p">You lost ...</p>
+        <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
     {/if}
 </section>
 
 <section id="enemy" class="w-1/3">
-    {#if state.hasInit === true}
+    {#if state.gameStatus === GameState.INITIALIZED || state.gameStatus === GameState.ROUND_STARTED || state.gameStatus === GameState.ROUND_PLAYED}
         <div class="flex flex-row items-center justify-between flex-wrap w-full">
             <div class="flex flex-col items-center justify-center w-full">
                 <h1 class="text-2xl font-bold">Enemy</h1>
