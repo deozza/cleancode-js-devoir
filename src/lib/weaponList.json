@@ -2,46 +2,55 @@
     {
         "name": "bow",
         "description": "Deals 1 damage to the enemy. Hits between 1 and 5 times.",
-        "rarity": "rare"
+        "rarity": "rare",
+        "damage": 1
     },
     {
         "name": "crossbow",
         "description": "Deals 2 damage to the enemy. Hits between 1 and 5 times.",
-        "rarity": "epic"
+        "rarity": "epic",
+        "damage": 2
     },
     {
         "name": "dagger",
         "description": "Deals 3 damage to the enemy.",
-        "rarity": "uncommon"
+        "rarity": "uncommon",
+        "damage": 2
     },
     {
         "name": "darts",
         "description": "Deals 1 damage to the enemy. Hits between 1 and 3 times.",
-        "rarity": "common"
+        "rarity": "common",
+        "damage": 3
     },
     {
         "name": "halberd",
         "description": "Deals 5 damage to the enemy.",
-        "rarity": "rare"
+        "rarity": "rare",
+        "damage": 5
     },
     {
         "name": "hatchet",
         "description": "Deals 1 damage to the enemy.",
-        "rarity": "common"
+        "rarity": "common",
+        "damage": 1
     },
     {
         "name": "knife",
         "description": "Deals 1 damage to the enemy.",
-        "rarity": "common"
+        "rarity": "common",
+        "damage": 1
     },
     {
         "name": "spear",
         "description": "Deals 1 damage to the enemy.",
-        "rarity": "common"
+        "rarity": "common",
+        "damage": 1
     },
     {
         "name": "sword",
         "description": "Deals 5 damage to the enemy.",
-        "rarity": "rare"
+        "rarity": "rare",
+        "damage": 3
     }
 ]

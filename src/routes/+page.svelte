@@ -47,6 +47,7 @@
         }
 
         if(response !== null) {
+            console.log(response);
             state.playerCurrentHealth = response[0];
             state.enemyCurrentHealth = response[1];
             state.enemyWeapon = response[2];
