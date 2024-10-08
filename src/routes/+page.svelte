@@ -38,6 +38,7 @@
                 state.enemyWeapon = response.enemyWeapon;
                 state.hasRound = response.hasRound;
                 state.hasFought = response.hasFought;
+                state.rerollsLeft = response.rerollsLeft;
             }
 
         } catch (error) {
