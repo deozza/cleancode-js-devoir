@@ -1,112 +1,96 @@
 <script lang="ts">
+    import { init, newRound, fight, rerollWeapon } from "$lib";
 
-    import { fight, init, newRound } from "$lib";
-
-    let state: any = {
-        playerMaxHealth: null,
-        playerCurrentHealth: null,
-        enemyMaxHealth: null,
-        enemyCurrentHealth: null,
-        playerWeapon: null,
-        enemyWeapon: null,
-        hasInit: false,
-        hasRound: false,
-        hasFought: false,
-        playerWon: false,
-        playerLost: false
-    };
-
-    function triggerInit() {
-        state = init();
-    }
+    let game = init();
+    let playerWeaponRerolls = 0;
 
     function triggerNewRound() {
-        let response = null;
-        try {        
-            response = newRound(state.hasInit);
-        } catch (error) {
-            console.error(error);
-        }
-
-        if(response !== null) {
-            state.playerWeapon = response.playerWeapon;
-            state.enemyWeapon = response.enemyWeapon;
-            state.hasRound = response.hasRound;
-            state.hasFought = response.hasFought;
-        }
-
+        const newRoundResult = newRound(true);
+        game.playerWeapon = newRoundResult.playerWeapon;
+        game.enemyWeapon = newRoundResult.enemyWeapon;
+        game.hasRound = newRoundResult.hasRound;
+        game.hasFought = newRoundResult.hasFought;
+        playerWeaponRerolls = newRoundResult.playerWeaponRerolls;
     }
 
     function triggerFight() {
-        let response = null;
-
-        try {        
-            response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
-        } catch (error) {
-            console.error(error);
-        }
-
-        if(response !== null) {
-            state.playerCurrentHealth = response[0];
-            state.enemyCurrentHealth = response[1];
-            state.enemyWeapon = response[2];
-            state.hasFought = response[3];
-            state.playerWon = response[4];
-            state.playerLost = response[5];
-        }
+        const result = fight(
+            game.playerCurrentHealth,
+            game.enemyCurrentHealth,
+            game.playerWeapon,
+            true,
+            true,
+            false,
+            playerWeaponRerolls
+        );
+        game.playerCurrentHealth = result[0];
+        game.enemyCurrentHealth = result[1];
+        game.enemyWeapon = result[2];
+        game.hasFought = result[3];
+        game.playerWon = result[4];
+        game.playerLost = result[5];
+        playerWeaponRerolls = result[6];
     }
 
+    function triggerRerollWeapon() {
+        const result = rerollWeapon(game.playerWeapon, playerWeaponRerolls, true, true);
+        game.playerWeapon = result.playerWeapon;
+        playerWeaponRerolls = result.playerWeaponRerolls;
+    }
 </script>
 
-
-<section id="player" class="w-1/3">
-    {#if state.hasInit === true}
+<section id="player">
+    {#if game.hasInit === true}
         <div class="flex flex-row items-center justify-between flex-wrap w-full">
             <div class="flex flex-col items-center justify-center w-full">
                 <h1 class="text-2xl font-bold">Player</h1>
-                <p class="text-lg">Health: {state.playerCurrentHealth} / {state.playerMaxHealth}</p>
-                <p class="text-lg">Weapon name: {state.playerWeapon.name}</p>
-                <p class="text-lg">Weapon description: {state.playerWeapon.description}</p>
+                <p class="text-lg">Health: {game.playerCurrentHealth} / {game.playerMaxHealth}</p>
+                <p class="text-lg">Weapon name: {game.playerWeapon.name}</p>
+                <p class="text-lg">Weapon description: {game.playerWeapon.description}</p>
             </div>
         </div>
     {/if}
 </section>
 
 <section id="action">
-    {#if state.hasInit === false}
-        <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Start</button>
+    {#if game.hasInit === false}
+        <button class="btn btn-xl variant-filled-primary" on:click={init}>Start</button>
     {:else}
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === false)}
+        {#if (game.hasRound === true && game.hasFought === true && game.playerWon === false && game.playerLost === false)}
             <button class="btn btn-xl variant-filled-warning" on:click={triggerNewRound}>Next Round</button>
         {/if}
 
-        {#if (state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false)}
-            <button class="btn btn-xl variant-filled-error" on:click={triggerFight}>Fight</button>
-        {/if}
-
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === true && state.playerLost === false)}
-            <p class="p">You won !</p>
-            <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
-        {/if}
-
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === true)}
-            <p class="p">You lost ...</p>
-            <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
-        {/if}
+        {#if (game.hasRound === true && game.hasFought === false && game.playerWon === false && game.playerLost === false)}
+        <button class="btn btn-xl variant-filled-error" on:click={triggerFight}>Fight</button>
     {/if}
+
+    {#if (game.hasRound === true && game.hasFought === true && game.playerWon === true && game.playerLost === false)}
+        <p class="p">Vous avez gagné !</p>
+        <button class="btn btn-xl variant-filled-primary" on:click={init}>Rejouer</button>
+    {/if}
+
+    {#if (game.hasRound === true && game.hasFought === true && game.playerWon === false && game.playerLost === true)}
+        <p class="p">Vous avez perdu...</p>
+        <button class="btn btn-xl variant-filled-primary" on:click={init}>Rejouer</button>
+    {/if}
+
+    {#if (game.hasRound === true && game.hasFought === false && game.playerWon === false && game.playerLost === false)}
+        <button class="btn btn-xl variant-filled-warning" on:click={triggerRerollWeapon}>Réinitialiser l'arme</button>
+    {/if}
+{/if}
 </section>
 
-<section id="enemy" class="w-1/3">
-    {#if state.hasInit === true}
-        <div class="flex flex-row items-center justify-between flex-wrap w-full">
-            <div class="flex flex-col items-center justify-center w-full">
-                <h1 class="text-2xl font-bold">Enemy</h1>
-                <p class="text-lg">Health: {state.enemyCurrentHealth} / {state.enemyMaxHealth}</p>
-                {#if state.enemyWeapon !== null}
-                    <p class="text-lg">Weapon name: {state.enemyWeapon.name}</p>
-                    <p class="text-lg">Weapon description: {state.enemyWeapon.description}</p>
-                {/if}
-            </div>
+<section id="enemy">
+{#if game.hasInit === true}
+    <div class="flex flex-row items-center justify-between flex-wrap w-full">
+        <div class="flex flex-col items-center justify-center w-full">
+            <h1 class="text-2xl font-bold">Enemy</h1>
+            <p class="text-lg">Health: {game.enemyCurrentHealth} / {game.enemyMaxHealth}</p>
+            {#if game.enemyWeapon !== null}
+                <p class="text-lg">Weapon name: {game.enemyWeapon.name}</p>
+                <p class="text-lg">Weapon description: {game.enemyWeapon.description}</p>
+            {/if}
         </div>
-    {/if}
+    </div>
+{/if}
 </section>
