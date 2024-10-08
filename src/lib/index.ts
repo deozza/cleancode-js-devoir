@@ -51,104 +51,87 @@ export function newRound(hasInit: boolean) {
     }
 }
 
-export function fight(playerHealth: number, enemyHealth: number, playerWeapon: any, hasInit: boolean, hasRound: boolean, hasFought: boolean): Array<number|boolean> {
+export function damage(weapon: any): number{
+        
+    let damageInflicted: number = 0;
+    switch (weapon.name) {
+        case 'hatchet':
+        case 'knife':
+        case 'spear':
+            damageInflicted += 1;
+            break;
+        case 'sword':
+        case 'halberd': 
+            damageInflicted += 5;
+            break;
+        case 'bow':
+            damageInflicted += 1 * (Math.floor(Math.random() * 5));
+            break;
+        case 'crossbow':
+            damageInflicted += 2 * (Math.floor(Math.random() * 5));
+            break
+        case 'darts':
+            damageInflicted += 1 * (Math.floor(Math.random() * 3));
+            break;
+        case 'dagger':
+            damageInflicted += 3;
+            break;
+        default:
+            throw new Error('Invalid weapon');
+    }
+    return damageInflicted;
+
+}
+
+export function resetWeapon(): Array<any>{
+    return weaponList = weapons;
+}
+
+export function setHealthToValid(health: number): number{
+    if(health <= 0) {
+        health = 0;
+    }
+    return health
+}
+
+export function gameIsOver(playerHealth: number, enemyHealth: number){
+    if(enemyHealth === 0 || playerHealth === 0) {
+        console.log("Game is over");
+        return true;
+    }
+}
+
+
+export function fight(playerHealth: number, enemyHealth: number, playerWeapon: any, enemyWeapon: any, hasInit: boolean, hasRound: boolean, hasFought: boolean): Array<number|boolean> {
     
     if(hasInit){
         if(hasRound){
             if(!hasFought) {
-    
-                let playerDamages: number = 0;
-                let enemyDamages: number = 0;
-            
-                switch (playerWeapon.name) {
-                    case 'hatchet':
-                    case 'knife':
-                    case 'spear':
-                        playerDamages += 1;
-                        break;
-                    case 'sword':
-                    case 'halberd': 
-                        playerDamages += 5;
-                        break;
-                    case 'bow':
-                        playerDamages += 1 * (Math.floor(Math.random() * 5));
-                        break;
-                    case 'crossbow':
-                        playerDamages += 2 * (Math.floor(Math.random() * 5));
-                        break
-                    case 'darts':
-                        playerDamages += 1 * (Math.floor(Math.random() * 3));
-                        break;
-                    case 'dagger':
-                        playerDamages += 3;
-                        break;
-                    default:
-                        throw new Error('Invalid weapon');
-                }
-            
-                // reset weapon list so the enemy could play
-                weaponList = weapons;
-            
-                let enemyWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
-            
-                switch (enemyWeapon.name) {
-                    case 'hatchet':
-                    case 'knife':
-                    case 'spear':
-                        enemyDamages += 1;
-                        break;
-                    case 'sword':
-                    case 'halberd': 
-                        enemyDamages += 5;
-                        break;
-                    case 'bow':
-                        enemyDamages += 1 * (Math.floor(Math.random() * 5));
-                        break;
-                    case 'crossbow':
-                        enemyDamages += 2 * (Math.floor(Math.random() * 5));
-                        break
-                    case 'darts':
-                        enemyDamages += 1 * (Math.floor(Math.random() * 3));
-                        break;
-                    case 'dagger':
-                        enemyDamages += 3;
-                        break;
-                    default:
-                        throw new Error('Invalid weapon');
-                }
 
-                if(playerDamages === enemyDamages) {
-                    return [playerHealth, enemyHealth];
+                console.log('fight starts')
+
+                damage(playerWeapon);
+                resetWeapon();
+                damage(enemyWeapon);
+
+                if(damage(playerWeapon) === damage(enemyWeapon)){
+                    return [playerHealth, enemyHealth]
                 }
             
-                if(playerDamages > enemyDamages) {
-                    enemyHealth -= playerDamages - enemyDamages;
+                if(damage(playerWeapon) > damage(enemyWeapon)) {
+                    enemyHealth -= damage(playerWeapon);
                 } else {
-                    playerHealth -= enemyDamages - playerDamages;
+                    playerHealth -= damage(enemyWeapon);
                 }
            
-                // health cannot be negative
-                if(playerHealth <= 0) {
-                    playerHealth = 0;
-                }
+
             
-                // health cannot be negative
-                if(enemyHealth <= 0) {
-                    enemyHealth = 0;
-                }
+                setHealthToValid(playerHealth);
+                setHealthToValid(enemyHealth);
                 
-                // check if the game is over and the player has won
-                if(enemyHealth === 0) {
-                    return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
-                }
-
-
-                // check if the game is over and the player has lost
-                if(playerHealth === 0) {
-                    return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
-                }
-            
+                gameIsOver(playerHealth, enemyHealth);
                 return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
+
             }else{
                 throw new Error('Round already played');
             }
