@@ -2,6 +2,8 @@
 
     import { fight, init, newRound } from "$lib";
 
+
+
     let state: any = {
         playerMaxHealth: null,
         playerCurrentHealth: null,
@@ -47,7 +49,6 @@
         }
 
         if(response !== null) {
-            console.log(response);
             state.playerCurrentHealth = response[0];
             state.enemyCurrentHealth = response[1];
             state.enemyWeapon = response[2];

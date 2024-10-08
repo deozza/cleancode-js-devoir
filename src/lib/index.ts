@@ -9,6 +9,24 @@ export interface weaponType {
 	rarity: string;
 }
 
+export enum GameStatus {
+	NotInitialized,
+	RoundActive,
+	RoundPlayed,
+	PlayerWon,
+	PlayerLost
+}
+
+export interface GameState {
+	playerMaxHealth: number | null;
+	playerCurrentHealth: number | null;
+	enemyMaxHealth: number | null;
+	enemyCurrentHealth: number | null;
+	playerWeapon: weaponType | null;
+	enemyWeapon: weaponType | null;
+	status: GameStatus; // Remplacer les booléens par un seul état
+}
+
 export function init() {
 	weaponList = weapons;
 
