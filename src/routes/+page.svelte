@@ -1,58 +1,79 @@
 <script lang="ts">
 
-    import { fight, init, newRound } from "$lib";
+    import { fight, init, newRound, rerollWeapon } from "$lib";
+    	import type { Game } from "$lib/gameState";
 
-    let state: any = {
-        playerMaxHealth: null,
-        playerCurrentHealth: null,
-        enemyMaxHealth: null,
-        enemyCurrentHealth: null,
-        playerWeapon: null,
-        enemyWeapon: null,
-        hasInit: false,
-        hasRound: false,
-        hasFought: false,
-        playerWon: false,
-        playerLost: false
-    };
+    let state: Game.State = initializeState();
+
+    function initializeState(): Game.State {
+        return {
+            playerMaxHealth: null,
+            playerCurrentHealth: null,
+            enemyMaxHealth: null,
+            enemyCurrentHealth: null,
+            playerWeapon: null,
+            enemyWeapon: null,
+            hasInit: false,
+            hasRound: false,
+            hasFought: false,
+            playerWon: false,
+            playerLost: false,
+            rerollsLeft: null,
+            pickedWeapons: []
+        };
+    }
 
     function triggerInit() {
         state = init();
     }
 
+
+
     function triggerNewRound() {
-        let response = null;
-        try {        
-            response = newRound(state.hasInit);
+        try {
+            const response = newRound(state.hasInit);
+            
+            if(response !== null) {
+                state.playerWeapon = response.playerWeapon;
+                state.enemyWeapon = response.enemyWeapon;
+                state.hasRound = response.hasRound;
+                state.hasFought = response.hasFought;
+            }
+
         } catch (error) {
-            console.error(error);
+            console.error('Error in triggerNewRound:', error);
         }
-
-        if(response !== null) {
-            state.playerWeapon = response.playerWeapon;
-            state.enemyWeapon = response.enemyWeapon;
-            state.hasRound = response.hasRound;
-            state.hasFought = response.hasFought;
-        }
-
     }
 
     function triggerFight() {
-        let response = null;
+        try {
+            const response = fight(state.playerCurrentHealth ?? 0, state.enemyCurrentHealth ?? 0, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
 
-        try {        
-            response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
+            if(response !== null) {
+                state.playerCurrentHealth = response.playerHealth;
+                state.enemyCurrentHealth = response.enemyHealth;
+                state.enemyWeapon = response.enemyWeapon;
+                state.hasFought = response.hasFought;
+                state.playerWon = response.playerWon;
+                state.playerLost = response.playerLost;
+            }
+            
         } catch (error) {
-            console.error(error);
+            console.error('Error in triggerFight:', error);
         }
+    }
 
-        if(response !== null) {
-            state.playerCurrentHealth = response[0];
-            state.enemyCurrentHealth = response[1];
-            state.enemyWeapon = response[2];
-            state.hasFought = response[3];
-            state.playerWon = response[4];
-            state.playerLost = response[5];
+    function triggerRerollWeapon() {
+        try {
+            const response = rerollWeapon(state);
+
+            if(response !== null) {
+                state.playerWeapon = response.playerWeapon;
+                state.rerollsLeft = response.rerollsLeft;
+                state.pickedWeapons = response.pickedWeapons;
+            }
+        } catch (error) {
+            console.error('Error in triggerRerollWeapon:', error);
         }
     }
 
@@ -65,8 +86,17 @@
             <div class="flex flex-col items-center justify-center w-full">
                 <h1 class="text-2xl font-bold">Player</h1>
                 <p class="text-lg">Health: {state.playerCurrentHealth} / {state.playerMaxHealth}</p>
-                <p class="text-lg">Weapon name: {state.playerWeapon.name}</p>
-                <p class="text-lg">Weapon description: {state.playerWeapon.description}</p>
+                {#if state.playerWeapon !== null}
+                    <p class="text-lg">Weapon name: {state.playerWeapon.name}</p>
+                    <p class="text-lg">Weapon description: {state.playerWeapon.description}</p>
+                {/if}
+                <button class="btn btn-xl variant-filled-primary" on:click={triggerRerollWeapon}>
+                    {#if state.rerollsLeft === 0 || state.rerollsLeft === null}
+                        No rerolls left
+                    {:else}
+                        Reroll weapon
+                    {/if}
+                </button>
             </div>
         </div>
     {/if}
