@@ -1,0 +1,3 @@
+La fonction fight() contient des commentaires qui sont dispensable à la compréhension du code.
+Le code n'est pas poli : on comprend l'utilité des fonctions en regardant leur contenu alors qu'elles devraient contenir un nom qui definit explicitement leur utilité.
+La fonction fight() contient des attributs (boolean, number) ce qui ne le rend pas propre, il faut donc remplacer : hasInit par IsInitialized, hasFought
