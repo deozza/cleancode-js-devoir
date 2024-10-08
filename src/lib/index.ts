@@ -3,14 +3,17 @@ import weapons from './weaponList.json';
 
 export let weaponList: any[] = [];
 
+const INITIAL_PLAYER_HEALTH = 10;
+const INITIAL_ENEMY_HEALTH = 10;
+
 export function init() {
     weaponList = weapons;
 
 
-    let playerMaxHealth = 10;
-    let playerCurrentHealth = 10;
-    let enemyMaxHealth = 10;
-    let enemyCurrentHealth = 10;
+    let playerMaxHealth = INITIAL_PLAYER_HEALTH;
+    let playerCurrentHealth = INITIAL_PLAYER_HEALTH;
+    let enemyMaxHealth = INITIAL_ENEMY_HEALTH;
+    let enemyCurrentHealth = INITIAL_ENEMY_HEALTH;
     let playerWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
     let enemyWeapon = null;
     let hasInit = true;
