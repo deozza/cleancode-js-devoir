@@ -29,18 +29,30 @@ La fonction est très longue et complexe, ce qui rend difficile sa compréhensio
 - Une fonction `checkGameEnd` qui prend en entrée les états de jeu et retourne un booléen indiquant si la partie est terminée.
 - Une fonction `chooseRandomWeapon` qui retourne une arme aléatoire pour le joueur et l'ennemi.
 - Une fonction `fight` qui appelle les fonctions précédentes pour simuler le combat entre le joueur et l'ennemi.
+- Une fonction `updateHealth` qui prend en entrée la santé d'un joueur et les dégâts infligés et retourne la nouvelle santé.
+- Une fonction `updateGameState` qui prend en entrée les dégâts infligés et met à jour les états de jeu en fonction des dégâts infligés et de la santé des joueurs.
+- Une fonction `hasPlayerWon` qui prend en entrée la santé de l'ennemi et retourne un booléen indiquant si le joueur a gagné.
+- Une fonction `hasPlayerLost` qui prend en entrée la santé du joueur et retourne un booléen indiquant si le joueur a perdu.
+- Une fonction `checkGameEnd` qui prend en entrée les états de jeu et retourne un booléen indiquant si la partie est terminée en fonction de la santé des joueurs.
+- Une fonction `calculateDamageForWeapons` qui prend en entrée les armes du joueur et de l'ennemi et retourne les dégâts infligés par chaque arme.
+- Une fonction `getDamageForWeapon` qui prend en entrée une arme et retourne les dégâts qu'elle inflige.
+
 
 
 ## Suggestions de refactoring
 
-- Créer une fonction `calculateDamage` qui prend en entrée l'arme du joueur et de l'ennemi et retourne les dégâts infligés.
-- Créer une fonction `updateGameState` qui prend en entrée les dégâts infligés et met à jour les états de jeu.
-- Créer une fonction `checkGameEnd` qui prend en entrée les états de jeu et retourne un booléen indiquant si la partie est terminée.
-- Créer une fonction `chooseRandomWeapon` qui retourne une arme aléatoire pour le joueur et l'ennemi.
-- Créer une fonction `initPlayer` qui initialise les propriétés du joueur.
-- Créer une fonction `initEnemy` qui initialise les propriétés de l'ennemi.
-- Créer une fonction `newRound` qui appelle les fonctions précédentes pour créer un nouveau tour de jeu.
-- Créer une fonction `fight` qui appelle les fonctions précédentes pour simuler le combat entre le joueur et l'ennemi.
+- Une fonction `calculateDamage` qui prend en entrée l'arme du joueur et de l'ennemi et retourne les dégâts infligés.
+- Une fonction `updateGameState` qui prend en entrée les dégâts infligés et met à jour les états de jeu.
+- Une fonction `checkGameEnd` qui prend en entrée les états de jeu et retourne un booléen indiquant si la partie est terminée.
+- Une fonction `chooseRandomWeapon` qui retourne une arme aléatoire pour le joueur et l'ennemi.
+- Une fonction `fight` qui appelle les fonctions précédentes pour simuler le combat entre le joueur et l'ennemi.
+- Une fonction `updateHealth` qui prend en entrée la santé d'un joueur et les dégâts infligés et retourne la nouvelle santé.
+- Une fonction `updateGameState` qui prend en entrée les dégâts infligés et met à jour les états de jeu en fonction des dégâts infligés et de la santé des joueurs.
+- Une fonction `hasPlayerWon` qui prend en entrée la santé de l'ennemi et retourne un booléen indiquant si le joueur a gagné.
+- Une fonction `hasPlayerLost` qui prend en entrée la santé du joueur et retourne un booléen indiquant si le joueur a perdu.
+- Une fonction `checkGameEnd` qui prend en entrée les états de jeu et retourne un booléen indiquant si la partie est terminée en fonction de la santé des joueurs.
+- Une fonction `calculateDamageForWeapons` qui prend en entrée les armes du joueur et de l'ennemi et retourne les dégâts infligés par chaque arme.
+- Une fonction `getDamageForWeapon` qui prend en entrée une arme et retourne les dégâts qu'elle inflige.
 
 ## Conclusion 
 
