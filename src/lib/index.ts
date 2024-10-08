@@ -1,163 +1,97 @@
-
 import weapons from './weaponList.json';
 
-export let weaponList: any[] = [];
+interface Weapon {
+    name: string;
+}
+
+interface FightResult {
+    playerHealth: number;
+    enemyHealth: number;
+    enemyWeapon: Weapon;
+    hasWon: boolean;
+    hasLost: boolean;
+    roundPlayed: boolean;
+}
+
+let weaponList: Weapon[] = [];
 
 export function init() {
     weaponList = weapons;
 
-
-    let playerMaxHealth = 10;
-    let playerCurrentHealth = 10;
-    let enemyMaxHealth = 10;
-    let enemyCurrentHealth = 10;
-    let playerWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
-    let enemyWeapon = null;
-    let hasInit = true;
-    let hasRound = true;
-    let hasFought = false;
-    let playerWon = false;
-    let playerLost = false;
-
-    weaponList = weapons;
+    const initialHealth = 10;
+    const playerWeapon = getRandomWeapon();
 
     return {
-        playerMaxHealth,
-        playerCurrentHealth,
-        enemyMaxHealth,
-        enemyCurrentHealth,
+        playerMaxHealth: initialHealth,
+        playerCurrentHealth: initialHealth,
+        enemyMaxHealth: initialHealth,
+        enemyCurrentHealth: initialHealth,
         playerWeapon,
+        enemyWeapon: null,
+        gameStatus: 'initialized'
+    };
+}
+
+export function newRound() {
+    weaponList = weapons;
+
+    const playerWeapon = getRandomWeapon();
+
+    return {
+        playerWeapon,
+        enemyWeapon: null,
+        gameStatus: 'round_started'
+    };
+}
+
+export function fight(
+    playerHealth: number,
+    enemyHealth: number,
+    playerWeapon: Weapon
+): FightResult {
+    const playerDamage = calculateDamage(playerWeapon);
+    const enemyWeapon = getRandomWeapon();
+    const enemyDamage = calculateDamage(enemyWeapon);
+
+    playerHealth -= Math.max(0, enemyDamage - playerDamage);
+    enemyHealth -= Math.max(0, playerDamage - enemyDamage);
+
+    playerHealth = Math.max(0, playerHealth);
+    enemyHealth = Math.max(0, enemyHealth);
+
+    return {
+        playerHealth,
+        enemyHealth,
         enemyWeapon,
-        hasInit,
-        hasRound,
-        hasFought,
-        playerWon,
-        playerLost
-    }
+        hasWon: enemyHealth === 0,
+        hasLost: playerHealth === 0,
+        roundPlayed: true,
+    };
 }
 
-export function newRound(hasInit: boolean) {
-    if(hasInit) {
-        weaponList = weapons;
+function calculateDamage(weapon: Weapon): number {
+    const damageMapping: { [key: string]: number | (() => number) } = {
+        'hatchet': 1,
+        'knife': 1,
+        'spear': 1,
+        'sword': 5,
+        'halberd': 5,
+        'bow': () => Math.floor(Math.random() * 5),
+        'crossbow': () => 2 * Math.floor(Math.random() * 5),
+        'darts': () => Math.floor(Math.random() * 3),
+        'dagger': 3
+    };
 
-        return {
-            playerWeapon: weaponList[Math.floor(Math.random() * weaponList.length)],
-            enemyWeapon: null,
-            hasRound: true,
-            hasFought: false
-        }
-    } else {
-        throw new Error('Game not initialized');
+    const damageValue = damageMapping[weapon.name];
+    if (typeof damageValue === 'function') {
+        return damageValue();
+    } else if (damageValue !== undefined) {
+        return damageValue;
     }
+
+    throw new Error(`Arme invalide : ${weapon.name}`);
 }
 
-export function fight(playerHealth: number, enemyHealth: number, playerWeapon: any, hasInit: boolean, hasRound: boolean, hasFought: boolean): Array<number|boolean> {
-    
-    if(hasInit){
-        if(hasRound){
-            if(!hasFought) {
-    
-                let playerDamages: number = 0;
-                let enemyDamages: number = 0;
-            
-                switch (playerWeapon.name) {
-                    case 'hatchet':
-                    case 'knife':
-                    case 'spear':
-                        playerDamages += 1;
-                        break;
-                    case 'sword':
-                    case 'halberd': 
-                        playerDamages += 5;
-                        break;
-                    case 'bow':
-                        playerDamages += 1 * (Math.floor(Math.random() * 5));
-                        break;
-                    case 'crossbow':
-                        playerDamages += 2 * (Math.floor(Math.random() * 5));
-                        break
-                    case 'darts':
-                        playerDamages += 1 * (Math.floor(Math.random() * 3));
-                        break;
-                    case 'dagger':
-                        playerDamages += 3;
-                        break;
-                    default:
-                        throw new Error('Invalid weapon');
-                }
-            
-                // reset weapon list so the enemy could play
-                weaponList = weapons;
-            
-                let enemyWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
-            
-                switch (enemyWeapon.name) {
-                    case 'hatchet':
-                    case 'knife':
-                    case 'spear':
-                        enemyDamages += 1;
-                        break;
-                    case 'sword':
-                    case 'halberd': 
-                        enemyDamages += 5;
-                        break;
-                    case 'bow':
-                        enemyDamages += 1 * (Math.floor(Math.random() * 5));
-                        break;
-                    case 'crossbow':
-                        enemyDamages += 2 * (Math.floor(Math.random() * 5));
-                        break
-                    case 'darts':
-                        enemyDamages += 1 * (Math.floor(Math.random() * 3));
-                        break;
-                    case 'dagger':
-                        enemyDamages += 3;
-                        break;
-                    default:
-                        throw new Error('Invalid weapon');
-                }
-
-                if(playerDamages === enemyDamages) {
-                    return [playerHealth, enemyHealth];
-                }
-            
-                if(playerDamages > enemyDamages) {
-                    enemyHealth -= playerDamages - enemyDamages;
-                } else {
-                    playerHealth -= enemyDamages - playerDamages;
-                }
-           
-                // health cannot be negative
-                if(playerHealth <= 0) {
-                    playerHealth = 0;
-                }
-            
-                // health cannot be negative
-                if(enemyHealth <= 0) {
-                    enemyHealth = 0;
-                }
-                
-                // check if the game is over and the player has won
-                if(enemyHealth === 0) {
-                    return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
-                }
-
-
-                // check if the game is over and the player has lost
-                if(playerHealth === 0) {
-                    return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
-                }
-            
-                return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
-            }else{
-                throw new Error('Round already played');
-            }
-        }else{
-            throw new Error('Round not initialized');
-        }
-    }else{
-        throw new Error('Game not initialized');
-    }
-
-
+function getRandomWeapon(): Weapon {
+    return weaponList[Math.floor(Math.random() * weaponList.length)];
 }
