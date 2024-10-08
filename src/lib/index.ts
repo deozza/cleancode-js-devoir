@@ -65,7 +65,7 @@ export function fight(playerHealth: number, enemyHealth: number, playerWeapon: a
     let enemyDamages: number = 0;
 
             
-    // Initialisation de l'arme de l'ennemi
+    // get a random weapon for the enemy
     let enemyWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
 
 
