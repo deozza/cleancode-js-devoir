@@ -160,4 +160,4 @@ export function fight(playerHealth: number, enemyHealth: number, playerWeapon: a
     }
 
 
-}
+} 
