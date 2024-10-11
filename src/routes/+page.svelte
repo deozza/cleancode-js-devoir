@@ -15,6 +15,7 @@
 
     function triggerInit() {
         game = new Game();
+        game.newRound();
         rerender();
     }
 
@@ -25,12 +26,17 @@
 
     function triggerFight() {
         try {        
-            game?.fight(game.player.weapon!);
+            game?.fight();
         } catch (error) {
             console.error(error);
         } finally {
             rerender();
         }
+    }
+
+    function triggerRerollPlayerWeapon() {
+        game?.player.rerollWeapon();
+        rerender();
     }
 
 </script>
@@ -55,6 +61,13 @@
         {:else}
             {#if (game?.hasRound === true && game?.hasFought === true && game?.playerWon === false && game?.playerLost === false)}
                 <button class="btn btn-xl variant-filled-warning" on:click={triggerNewRound}>Next Round</button>
+            {/if}
+
+            {#if (
+                game?.player.canRerollWeapon() &&
+                game?.hasRound === true && game?.hasFought === false && game?.playerWon === false && game?.playerLost === false
+            )}
+                <button class="btn btn-xl variant-filled-primary" on:click={triggerRerollPlayerWeapon}>Reroll weapon</button>
             {/if}
 
             {#if (game?.hasRound === true && game?.hasFought === false && game?.playerWon === false && game?.playerLost === false)}

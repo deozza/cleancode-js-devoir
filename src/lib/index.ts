@@ -11,15 +11,19 @@ import { SwordWeapon } from './weapons/sword-weapon';
 class Player {
     health: number;
     maxHealth: number;
-    weapon: Weapon | null;
+    weapon: Weapon | null = null;
+
+    private weaponList: Weapon[] = [];
+    private rerollCount = 0;
+    private MAX_REROLL_COUNT = 2;
 
     constructor(player: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [key in keyof Player as Player[key] extends (...args: any[]) => any ? never : key]: Player[key]
+        health: number;
+        maxHealth: number;
     }) {
         this.health = player.health;
         this.maxHealth = player.maxHealth;
-        this.weapon = player.weapon;
+        this.resetWeaponList();
     }
 
     damage(damage: number) {
@@ -28,28 +32,28 @@ class Player {
             this.health = 0;
         }
     }
-}
 
-export class Game {
-    player = new Player({
-        health: 10,
-        maxHealth: 10,
-        weapon: this.getRandomWeapon()
-    });
-    enemy = new Player({
-        health: 10,
-        maxHealth: 10,
-        weapon: this.getRandomWeapon()
-    });
+    takeRandomWeapon() {
+        this.weapon = this.getRandomWeapon();
+    }
 
-    hasRound = true;
-    hasFought = false;
+    canRerollWeapon(): boolean {
+        return this.rerollCount < this.MAX_REROLL_COUNT;
+    }
 
-    playerWon = false;
-    playerLost = false;
+    rerollWeapon() {
+        if (!this.canRerollWeapon()) throw new Error('Cannot reroll weapon');
+        this.weapon = this.getRandomWeapon();
+        this.rerollCount++;
+    }
 
-    private getWeaponList(): Weapon[] {
-        return [
+    resetRerollCount() {
+        this.rerollCount = 0;
+        this.resetWeaponList();
+    }
+
+    private resetWeaponList() {
+        this.weaponList = [
             new BowWeapon(),
             new CrossbowWeapon(),
             new DaggerWeapon(),
@@ -62,28 +66,44 @@ export class Game {
     }
 
     private getRandomWeapon(): Weapon {
-        const weaponList = this.getWeaponList();
-        return weaponList[Math.floor(Math.random() * weaponList.length)];
+        const randomIndex = Math.floor(Math.random() * this.weaponList.length);
+        const weapon = this.weaponList[randomIndex];
+        this.weaponList.splice(randomIndex, 1);
+        return weapon;
     }
+}
+
+export class Game {
+    player = new Player({ health: 10, maxHealth: 10 });
+    enemy = new Player({ health: 10, maxHealth: 10 });
+
+    hasRound = true;
+    hasFought = false;
+
+    playerWon = false;
+    playerLost = false;
 
     newRound() {
-        this.player.weapon = this.getRandomWeapon();
-        this.enemy.weapon = null;
         this.hasRound = true;
         this.hasFought = false;
+        this.player.resetRerollCount();
+        this.player.takeRandomWeapon();
+        this.enemy.takeRandomWeapon();
     }
 
-    fight(playerWeapon: Weapon): void {
+    fight(): void {
         if (!this.hasRound) throw new Error('Round not initialized');
         if (this.hasFought) throw new Error('Round already played');
 
-        let playerDamages: number = 0;
-        let enemyDamages: number = 0;
+        const playerWeapon = this.player.weapon;
+        const enemyWeapon = this.enemy.weapon;
 
-        playerDamages += playerWeapon.getDamage();
+        if (!playerWeapon || !enemyWeapon) {
+            throw new Error('Player or enemy weapon not initialized');
+        }
 
-        const enemyWeapon = this.getRandomWeapon();
-        enemyDamages += enemyWeapon.getDamage();
+        const playerDamages = playerWeapon.getDamage();
+        const enemyDamages = enemyWeapon.getDamage();
 
         if (playerDamages === enemyDamages) {
             return;
