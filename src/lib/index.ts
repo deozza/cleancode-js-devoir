@@ -11,7 +11,7 @@ export function init() {
     let playerCurrentHealth = 10;
     let enemyMaxHealth = 10;
     let enemyCurrentHealth = 10;
-    let playerWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
+    let playerWeapon = chooseWeapon();
     let enemyWeapon = null;
     let hasInit = true;
     let hasRound = true;
@@ -54,7 +54,7 @@ export function newRound(hasInit: boolean) {
 export function fight(playerHealth: number, enemyHealth: number, playerWeapon: any, hasInit: boolean, hasRound: boolean, hasFought: boolean): Array<number|boolean> {
     checkInitialConditions(hasInit, hasRound, hasFought);
     let playerDamages = calculateDamage(playerWeapon.name);
-    let enemyWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
+    let enemyWeapon = chooseWeapon()
     let enemyDamages = calculateDamage(enemyWeapon.name);
 
     [playerHealth, enemyHealth] = changingHealthPoint(playerHealth, enemyHealth, playerDamages, enemyDamages);
@@ -127,4 +127,8 @@ export function checkIfOver(playerHealth: number, enemyHealth: number, enemyWeap
         return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
     }        
     return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
+}
+
+export function chooseWeapon(): any {
+    return weaponList[Math.floor(Math.random() * weaponList.length)];
 }
