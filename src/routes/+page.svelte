@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import { fight, init, newRound } from "$lib";
+    import { fight, init, newRound, type ResultFight } from "$lib";
 
     let state: any = {
         playerMaxHealth: null,
@@ -38,23 +38,24 @@
     }
 
     function triggerFight() {
-        let response = null;
+    let response: ResultFight | null = null;
 
-        try {        
-            response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
-        } catch (error) {
-            console.error(error);
-        }
-
-        if(response !== null) {
-            state.playerCurrentHealth = response[0];
-            state.enemyCurrentHealth = response[1];
-            state.enemyWeapon = response[2];
-            state.hasFought = response[3];
-            state.playerWon = response[4];
-            state.playerLost = response[5];
-        }
+    try {        
+        response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
+    } catch (error) {
+        console.error(error);
     }
+
+    if(response !== null) {
+        state.playerCurrentHealth = response.playerHealth;
+        state.enemyCurrentHealth = response.enemyHealth;
+        state.enemyWeapon = response.enemyWeapon;
+        state.hasFought = true;
+        state.playerWon = response.playerWon || false; 
+        state.playerLost = response.playerLost || false;
+    }
+}
+
 
 </script>
 
