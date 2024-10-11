@@ -85,16 +85,10 @@ class Player implements Actor {
 export class Game implements Actor {
     player = new Player({ health: 10, maxHealth: 10 });
     enemy = new Player({ health: 10, maxHealth: 10 });
-
-    hasRound = true;
-    hasFought = false;
-
-    playerWon = false;
-    playerLost = false;
+    state: Game.GameState = Game.GameState.INITIALIZED;
 
     startNewRound() {
-        this.hasRound = true;
-        this.hasFought = false;
+        this.state = Game.GameState.ROUND_STARTED;
         this.player.startNewRound();
         this.enemy.startNewRound();
     }
@@ -104,7 +98,7 @@ export class Game implements Actor {
 
         const { playerDamages, enemyDamages } = this.getDamages();
 
-        this.hasFought = true;
+        this.state = Game.GameState.ROUND_ENDED;
 
         if (playerDamages === enemyDamages) {
             return;
@@ -122,8 +116,8 @@ export class Game implements Actor {
     }
 
     private assertCanFight() {
-        if (!this.hasRound) throw new Error('Round not initialized');
-        if (this.hasFought) throw new Error('Round already played');
+        if (this.state === Game.GameState.ROUND_ENDED) throw new Error('Round already played');
+        if (this.state !== Game.GameState.ROUND_STARTED) throw new Error('Round not initialized');
     }
 
     private getDamages() {
@@ -141,12 +135,18 @@ export class Game implements Actor {
     }
 
     private determineWinner(): void {
-        if (this.player.health === 0) {
-            this.playerLost = true;
-        }
+        if (this.player.health === 0) this.state = Game.GameState.PLAYER_LOST;
+        if (this.enemy.health === 0) this.state = Game.GameState.PLAYER_WON;
+    }
+}
 
-        if (this.enemy.health === 0) {
-            this.playerWon = true;
-        }
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace Game {
+    export enum GameState {
+        INITIALIZED,
+        ROUND_STARTED,
+        ROUND_ENDED,
+        PLAYER_WON,
+        PLAYER_LOST,
     }
 }

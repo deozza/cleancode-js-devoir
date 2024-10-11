@@ -58,27 +58,24 @@
         {#if !isGameReady()}
             <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Start</button>
         {:else}
-            {#if (game?.hasRound === true && game?.hasFought === true && game?.playerWon === false && game?.playerLost === false)}
+             {#if (game?.state === Game.GameState.ROUND_ENDED)}
                 <button class="btn btn-xl variant-filled-warning" on:click={triggerNewRound}>Next Round</button>
             {/if}
 
-            {#if (
-                game?.player.canRerollWeapon() &&
-                game?.hasRound === true && game?.hasFought === false && game?.playerWon === false && game?.playerLost === false
-            )}
+            {#if (game?.player.canRerollWeapon() && game?.state === Game.GameState.ROUND_STARTED)}
                 <button class="btn btn-xl variant-filled-primary" on:click={triggerRerollPlayerWeapon}>Reroll weapon</button>
             {/if}
 
-            {#if (game?.hasRound === true && game?.hasFought === false && game?.playerWon === false && game?.playerLost === false)}
+            {#if (game?.state === Game.GameState.ROUND_STARTED)}
                 <button class="btn btn-xl variant-filled-error" on:click={triggerFight}>Fight</button>
             {/if}
 
-            {#if (game?.hasRound === true && game?.hasFought === true && game?.playerWon === true && game?.playerLost === false)}
+            {#if (game?.state === Game.GameState.PLAYER_WON)}
                 <p class="p">You won !</p>
                 <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
             {/if}
 
-            {#if (game?.hasRound === true && game?.hasFought === true && game?.playerWon === false && game?.playerLost === true)}
+            {#if (game?.state === Game.GameState.PLAYER_LOST)}
                 <p class="p">You lost ...</p>
                 <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
             {/if}

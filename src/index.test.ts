@@ -15,12 +15,12 @@ describe('game test', () => {
 		});
 
 		it('should forbid fighting if round not initialized', () => {
-			game.hasRound = false;
+			game.state = Game.GameState.INITIALIZED;
 			expect(() => game.fight()).toThrowError('Round not initialized');
 		});
 
 		it('should forbid fighting if round already played', () => {
-			game.hasFought = true;
+			game.state = Game.GameState.ROUND_ENDED;
 			expect(() => game.fight()).toThrowError('Round already played');
 		});
 
@@ -74,8 +74,7 @@ describe('game test', () => {
 
 			game.fight();
 
-			expect(game.playerWon).toBe(true);
-			expect(game.playerLost).toBe(false);
+			expect(game.state).toBe(Game.GameState.PLAYER_WON);
 		});
 
 		it('should declare player as loser if player health reaches zero', () => {
@@ -84,8 +83,7 @@ describe('game test', () => {
 
 			game.fight();
 
-			expect(game.playerWon).toBe(false);
-			expect(game.playerLost).toBe(true);
+			expect(game.state).toBe(Game.GameState.PLAYER_LOST);
 		});
 	});
 
