@@ -13,11 +13,13 @@
         hasRound: false,
         hasFought: false,
         playerWon: false,
-        playerLost: false
+        playerLost: false,
+        hasReloaded: false
     };
 
     function triggerInit() {
         state = init();
+        console.log(state);
     }
 
     function triggerNewRound() {
@@ -53,6 +55,7 @@
             state.hasFought = response[3];
             state.playerWon = response[4];
             state.playerLost = response[5];
+            state.hasReloaded = response[6];
         }
     }
 
@@ -65,6 +68,7 @@
         }
         if(response !== null) {
             state.playerWeapon = response;
+            state.hasReloaded = true;
         }
     }
 
@@ -82,8 +86,8 @@
             </div>
         </div>
     {/if}
-    {#if (state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false)}
-            <button class="btn btn-xl variant-filled-error" on:click={triggerReload}>Reload</button>
+    {#if (state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false && state.hasReloaded === false)}
+            <button class="btn btn-xl variant-filled-warning" on:click={triggerReload}>Reload</button>
         {/if}
 </section>
 

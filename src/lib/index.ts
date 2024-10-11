@@ -18,6 +18,7 @@ export function init() {
     let hasFought = false;
     let playerWon = false;
     let playerLost = false;
+    let hasReloaded = false;
 
     weaponList = weapons;
 
@@ -32,7 +33,8 @@ export function init() {
         hasRound,
         hasFought,
         playerWon,
-        playerLost
+        playerLost,
+        hasReloaded
     }
 }
 
@@ -120,13 +122,13 @@ export function changingHealthPoint(playerHealth: number, enemyHealth: number, p
 
 export function checkIfOver(playerHealth: number, enemyHealth: number, enemyWeapon: any): any {
     if(enemyHealth === 0) {
-        return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
+        return [playerHealth, enemyHealth, enemyWeapon, true, true, false, false];
     }
 
     if(playerHealth === 0) {
-        return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
+        return [playerHealth, enemyHealth, enemyWeapon, true, false, true, false];
     }        
-    return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
+    return [playerHealth, enemyHealth, enemyWeapon, true, false, false, false];
 }
 
 export function chooseWeapon(): any {
