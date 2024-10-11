@@ -52,40 +52,10 @@ export function newRound(hasInit: boolean) {
 }
 
 export function fight(playerHealth: number, enemyHealth: number, playerWeapon: any, hasInit: boolean, hasRound: boolean, hasFought: boolean): Array<number|boolean> {
-    //on regarder si on peut jouer
-    //on calcule les dégats du joueur
-    //l'ennemie selectionne une arme
-    //on calcule les dégats de l'ennemie
-    //on compare les dégats
-    //on retire les dégats de la vie
     checkInitialConditions(hasInit, hasRound, hasFought);
-    let playerDamages: number = 0;
     let enemyDamages: number = 0;
-    switch (playerWeapon.name) {
-        case 'hatchet':
-        case 'knife':
-        case 'spear':
-            playerDamages += 1;
-            break;
-        case 'sword':
-        case 'halberd': 
-            playerDamages += 5;
-            break;
-        case 'bow':
-            playerDamages += 1 * (Math.floor(Math.random() * 5));
-            break;
-        case 'crossbow':
-            playerDamages += 2 * (Math.floor(Math.random() * 5));
-            break
-        case 'darts':
-            playerDamages += 1 * (Math.floor(Math.random() * 3));
-            break;
-        case 'dagger':
-            playerDamages += 3;
-            break;
-        default:
-            throw new Error('Invalid weapon');
-        }    
+    let playerDamages = calculateDamage(playerWeapon.name);
+    console.log('playerDamages', playerDamages);
         // reset weapon list so the enemy could play
         weaponList = weapons;
             
@@ -162,4 +132,26 @@ export function checkInitialConditions(hasInit: boolean, hasRound: boolean, hasF
     if (hasFought) {
         throw new Error('Already fought this round');
     }
+}
+
+
+export function calculateDamage(weapon: string): number {
+    const weaponDamageMap: { [key: string]: number | (() => number) } = {
+        'hatchet': 1,
+        'knife': 1,
+        'spear': 1,
+        'sword': 5,
+        'halberd': 5,
+        'bow': () => 1 * (Math.floor(Math.random() * 5)),
+        'crossbow': () => 2 * (Math.floor(Math.random() * 5)),
+        'darts': () => 1 * (Math.floor(Math.random() * 3)),
+        'dagger': 3
+    };
+
+    const damage = weaponDamageMap[weapon];
+    if (damage === undefined) {
+        throw new Error('Invalid weapon');
+    }
+
+    return typeof damage === 'function' ? damage() : damage;
 }
