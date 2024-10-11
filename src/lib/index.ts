@@ -1,42 +1,71 @@
 import { WEAPONS } from '../types/weapons';
-import type { Weapon, Fighter, GameState } from '../types/gameType';
+import type { ExtendedGameState } from '../types/extendedGameState';
+import type { Weapon, Fighter } from '../types/gameType';
 
-function getRandomWeapon(): Weapon {
-	const weaponKeys = Object.keys(WEAPONS);
-	const randomKey = weaponKeys[
-		Math.floor(Math.random() * weaponKeys.length)
-	] as keyof typeof WEAPONS;
-	return WEAPONS[randomKey];
+function getRandomUnusedWeapon(usedWeapons: Set<string>): Weapon {
+	const availableWeapons = Object.entries(WEAPONS).filter(([key]) => !usedWeapons.has(key));
+	if (availableWeapons.length === 0) {
+		throw new Error('No more unused weapons available');
+	}
+	const randomIndex = Math.floor(Math.random() * availableWeapons.length);
+	return availableWeapons[randomIndex][1];
 }
 
-function createFighter(): Fighter {
+export function changePlayerWeapon(gameState: ExtendedGameState): ExtendedGameState {
+	if (gameState.playerWeaponChanges >= 2) {
+		throw new Error('Maximum number of weapon changes reached');
+	}
+
+	const newWeapon = getRandomUnusedWeapon(gameState.usedWeapons);
+	gameState.usedWeapons.add(newWeapon.name);
+
+	return {
+		...gameState,
+		player: { ...gameState.player, weapon: newWeapon },
+		playerWeaponChanges: gameState.playerWeaponChanges + 1
+	};
+}
+
+function createFighter(usedWeapons: Set<string>): Fighter {
+	const weapon = getRandomUnusedWeapon(usedWeapons);
+	usedWeapons.add(weapon.name);
 	return {
 		maxHealth: 10,
 		currentHealth: 10,
-		weapon: getRandomWeapon()
+		weapon
 	};
 }
 
-export function init(): GameState {
+export function init(): ExtendedGameState {
+	const usedWeapons = new Set<string>();
 	return {
-		player: createFighter(),
-		enemy: createFighter(),
+		player: createFighter(usedWeapons),
+		enemy: createFighter(usedWeapons),
 		round: 1,
 		isGameOver: false,
-		winner: null
+		winner: null,
+		playerWeaponChanges: 0,
+		usedWeapons
 	};
 }
 
-export function newRound(gameState: GameState): GameState {
+export function newRound(gameState: ExtendedGameState): ExtendedGameState {
 	if (!gameState) {
 		throw new Error('Game not initialized');
 	}
 
+	const newPlayerWeapon = getRandomUnusedWeapon(gameState.usedWeapons);
+	const newEnemyWeapon = getRandomUnusedWeapon(gameState.usedWeapons);
+
+	gameState.usedWeapons.add(newPlayerWeapon.name);
+	gameState.usedWeapons.add(newEnemyWeapon.name);
+
 	return {
 		...gameState,
-		player: { ...gameState.player, weapon: getRandomWeapon() },
-		enemy: { ...gameState.enemy, weapon: getRandomWeapon() },
-		round: gameState.round + 1
+		player: { ...gameState.player, weapon: newPlayerWeapon },
+		enemy: { ...gameState.enemy, weapon: newEnemyWeapon },
+		round: gameState.round + 1,
+		playerWeaponChanges: 0
 	};
 }
 
@@ -44,7 +73,7 @@ function calculateDamage(weapon: Weapon): number {
 	return typeof weapon.damage === 'function' ? weapon.damage() : weapon.damage;
 }
 
-export function fight(gameState: GameState): GameState {
+export function fight(gameState: ExtendedGameState): ExtendedGameState {
 	if (gameState.isGameOver) {
 		throw new Error('Game is already over');
 	}
@@ -72,18 +101,8 @@ export function fight(gameState: GameState): GameState {
 		enemy: { ...gameState.enemy, currentHealth: enemyHealth },
 		round: gameState.round,
 		isGameOver,
-		winner
+		winner,
+		playerWeaponChanges: gameState.playerWeaponChanges,
+		usedWeapons: gameState.usedWeapons
 	};
-}
-
-export function getDamageForWeapon(weaponName: string): number | (() => number) {
-	const weapon = Object.values(WEAPONS).find(
-		(w) => w.name.toLowerCase() === weaponName.toLowerCase()
-	);
-
-	if (!weapon) {
-		throw new Error(`Invalid weapon: ${weaponName}`);
-	}
-
-	return weapon.damage;
 }
