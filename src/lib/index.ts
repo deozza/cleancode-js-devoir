@@ -6,6 +6,7 @@ export let weaponList: any[] = [];
 export function init() {
     weaponList = weapons;
 
+    //test 
 
     let playerMaxHealth = 10;
     let playerCurrentHealth = 10;
