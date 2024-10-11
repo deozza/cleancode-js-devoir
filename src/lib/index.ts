@@ -8,7 +8,11 @@ import { KnifeWeapon } from './weapons/knife-weapon';
 import { SpearWeapon } from './weapons/spear-weapon';
 import { SwordWeapon } from './weapons/sword-weapon';
 
-class Player {
+interface Actor {
+    newRound(): void;
+}
+
+class Player implements Actor {
     health: number;
     maxHealth: number;
     weapon: Weapon | null = null;
@@ -33,10 +37,6 @@ class Player {
         }
     }
 
-    takeRandomWeapon() {
-        this.weapon = this.getRandomWeapon();
-    }
-
     canRerollWeapon(): boolean {
         return this.rerollCount < this.MAX_REROLL_COUNT;
     }
@@ -47,7 +47,12 @@ class Player {
         this.rerollCount++;
     }
 
-    resetRerollCount() {
+    newRound(): void {
+        this.resetRerollCount();
+        this.takeRandomWeapon();
+    }
+
+    private resetRerollCount() {
         this.rerollCount = 0;
         this.resetWeaponList();
     }
@@ -65,6 +70,10 @@ class Player {
         ];
     }
 
+    private takeRandomWeapon() {
+        this.weapon = this.getRandomWeapon();
+    }
+
     private getRandomWeapon(): Weapon {
         const randomIndex = Math.floor(Math.random() * this.weaponList.length);
         const weapon = this.weaponList[randomIndex];
@@ -73,7 +82,7 @@ class Player {
     }
 }
 
-export class Game {
+export class Game implements Actor {
     player = new Player({ health: 10, maxHealth: 10 });
     enemy = new Player({ health: 10, maxHealth: 10 });
 
@@ -86,9 +95,8 @@ export class Game {
     newRound() {
         this.hasRound = true;
         this.hasFought = false;
-        this.player.resetRerollCount();
-        this.player.takeRandomWeapon();
-        this.enemy.takeRandomWeapon();
+        this.player.newRound();
+        this.enemy.newRound();
     }
 
     fight(): void {
