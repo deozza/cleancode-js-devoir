@@ -24,11 +24,6 @@ export function init() {
     let enemyCurrentHealth = 10;
     let playerWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
     let enemyWeapon = null;
-    let hasInit = true;
-    let hasRound = true;
-    let hasFought = false;
-    let playerWon = false;
-    let playerLost = false;
 
     return {
         playerMaxHealth,
@@ -37,13 +32,27 @@ export function init() {
         enemyCurrentHealth,
         playerWeapon,
         enemyWeapon,
-        hasInit,
-        hasRound,
-        hasFought,
-        playerWon,
-        playerLost
+        rerolls: 2, 
+        usedWeapons: new Set<string>(),
+        hasInit: true,
+        hasRound: true,
+        hasFought: false,
+        playerWon: false,
+        playerLost: false
     };
 }
+
+export function rerollWeapon(usedWeapons: Set<string>) {
+    const availableWeapons = weaponList.filter(weapon => !usedWeapons.has(weapon.name));
+    
+    if (availableWeapons.length === 0) {
+        return null;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * availableWeapons.length);
+    return availableWeapons[randomIndex];
+}
+
 
 export function newRound(hasInit: boolean) {
     if (hasInit) {

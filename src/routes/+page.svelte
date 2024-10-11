@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import { fight, init, newRound, type ResultFight } from "$lib";
+    import { fight, init, newRound, rerollWeapon, type ResultFight } from "$lib";
 
     let state: any = {
         playerMaxHealth: null,
@@ -9,6 +9,8 @@
         enemyCurrentHealth: null,
         playerWeapon: null,
         enemyWeapon: null,
+        rerolls: 2,
+        usedWeapons: new Set<string>(),
         hasInit: false,
         hasRound: false,
         hasFought: false,
@@ -22,7 +24,7 @@
 
     function triggerNewRound() {
         let response = null;
-        try {        
+        try {
             response = newRound(state.hasInit);
         } catch (error) {
             console.error(error);
@@ -38,25 +40,34 @@
     }
 
     function triggerFight() {
-    let response: ResultFight | null = null;
+        let response: ResultFight | null = null;
 
-    try {        
-        response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
-    } catch (error) {
-        console.error(error);
+        try {
+            response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
+        } catch (error) {
+            console.error(error);
+        }
+
+        if(response !== null) {
+            state.playerCurrentHealth = response.playerHealth;
+            state.enemyCurrentHealth = response.enemyHealth;
+            state.enemyWeapon = response.enemyWeapon;
+            state.hasFought = true;
+            state.playerWon = response.playerWon || false;
+            state.playerLost = response.playerLost || false;
+        }
     }
 
-    if(response !== null) {
-        state.playerCurrentHealth = response.playerHealth;
-        state.enemyCurrentHealth = response.enemyHealth;
-        state.enemyWeapon = response.enemyWeapon;
-        state.hasFought = true;
-        state.playerWon = response.playerWon || false; 
-        state.playerLost = response.playerLost || false;
+    function triggerReroll() {
+        if (state.rerolls > 0) {
+            const newWeapon = rerollWeapon(state.usedWeapons);
+            if (newWeapon) {
+                state.playerWeapon = newWeapon;
+                state.usedWeapons.add(newWeapon.name);
+                state.rerolls--; 
+            }
+        }
     }
-}
-
-
 </script>
 
 
@@ -77,12 +88,13 @@
     {#if state.hasInit === false}
         <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Start</button>
     {:else}
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === false)}
-            <button class="btn btn-xl variant-filled-warning" on:click={triggerNewRound}>Next Round</button>
-        {/if}
-
-        {#if (state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false)}
+        {#if state.hasRound === true && state.hasFought === false}
             <button class="btn btn-xl variant-filled-error" on:click={triggerFight}>Fight</button>
+            {#if state.rerolls > 0}
+                <button class="btn btn-xl variant-filled-info" on:click={triggerReroll}>Reroll Weapon ({state.rerolls})</button>
+            {/if}
+        {:else if state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === false}
+            <button class="btn btn-xl variant-filled-warning" on:click={triggerNewRound}>Next Round</button>
         {/if}
 
         {#if (state.hasRound === true && state.hasFought === true && state.playerWon === true && state.playerLost === false)}
