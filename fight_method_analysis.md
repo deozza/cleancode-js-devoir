@@ -11,7 +11,7 @@ SOLUTION => Utilisé un objet pour mapper les armes au dégats
 SOLUTION => faire des fonctions séparer comme calculateDamage() qui va calculer les dégats en fonction d'une arme ou selectWeapon() qui va sélectionner une arme.
 
 - Trop de paramètre de fonction : la méthode prend trop de paramètre
-SOLUTION => 
+SOLUTION => Faire un system d'enum pour représenter les différents etat du jeu
 
 - Des commentaires inutiles : la présence de commentaire inutile qui augmente la taille de la methode pour rien 
 SOLUTION => simplifier le code afin de ne plus avoir besoin de commentaire.

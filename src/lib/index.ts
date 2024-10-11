@@ -66,19 +66,36 @@ export function fight(playerHealth: number, enemyHealth: number, playerWeapon: a
         return checkIfOver(playerHealth, enemyHealth, enemyWeapon);
     }
     catch(e: any) {
-        console.log(e.message);
+        throw new Error(e.message);
     }
 }
 
 
 export function checkInitialConditions(hasInit: boolean, hasRound: boolean, hasFought: boolean): void {
-    if (!hasInit) {
+    try {
+        isGameInit(hasInit);
+        isRoundInit(hasRound);
+        isRoundFought(hasFought);
+    }
+    catch(e: any) {
+        throw new Error(e.message);
+    }
+}
+
+export function isGameInit(hasInit: boolean): void {
+    if(!hasInit) {
         throw new Error('Game not initialized');
     }
-    if (!hasRound) {
+}
+
+export function isRoundInit(hasRound: boolean): void {
+    if(!hasRound) {
         throw new Error('Round not started');
     }
-    if (hasFought) {
+}
+
+export function isRoundFought(hasFought: boolean): void {
+    if(hasFought) {
         throw new Error('Already fought this round');
     }
 }
@@ -153,6 +170,6 @@ export function reloadWeapon(userWeapon : any) : any{
         return chooseWeapon();
     }
     catch(e : any) {
-        console.log(e.message);
+        throw new Error(e.message);
     }
 }
