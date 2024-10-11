@@ -1,9 +1,10 @@
 <script lang="ts">
 
-    import { Game } from "$lib";
+    import { Game } from "$lib/game";
 
     let game: Game | undefined;
     let rerenderKey = true;
+    let error: string | undefined;
 
     function rerender() {
         rerenderKey = !rerenderKey;
@@ -28,19 +29,36 @@
         try {
             game!.fight();
         } catch (error) {
+            if (error instanceof Error) {
+                error = error.message;
+            }
             console.error(error);
         }
         rerender();
     }
 
     function triggerRerollPlayerWeapon() {
-        game?.player.rerollWeapon();
+        try {
+            game?.player.rerollWeapon();
+        } catch (error) {
+            if (error instanceof Error) {
+                error = error.message;
+            }
+            console.error(error);
+        }
         rerender();
     }
 
 </script>
 
 {#key rerenderKey}
+    {#if error}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">Error:</strong>
+            <span class="block sm:inline">{error}</span>
+        </div>
+    {/if}
+
     <section id="player" class="w-1/3">
         {#if isGameReady()}
             <div class="flex flex-row items-center justify-between flex-wrap w-full">
