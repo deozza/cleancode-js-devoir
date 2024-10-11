@@ -132,3 +132,11 @@ export function checkIfOver(playerHealth: number, enemyHealth: number, enemyWeap
 export function chooseWeapon(): any {
     return weaponList[Math.floor(Math.random() * weaponList.length)];
 }
+
+export function reloadWeapon(userWeapon : any) : any{
+    let newWeapon = chooseWeapon();
+    if(newWeapon.name === userWeapon.name) {
+        return reloadWeapon(userWeapon);
+    }
+    return chooseWeapon();
+}

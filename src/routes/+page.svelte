@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import { fight, init, newRound } from "$lib";
+    import { fight, init, newRound, reloadWeapon } from "$lib";
 
     let state: any = {
         playerMaxHealth: null,
@@ -56,6 +56,18 @@
         }
     }
 
+    function triggerReload() {
+        let response = null;
+        try {        
+            response = reloadWeapon(state.playerWeapon);
+        } catch (error) {
+            console.error(error);
+        }
+        if(response !== null) {
+            state.playerWeapon = response;
+        }
+    }
+
 </script>
 
 
@@ -70,6 +82,9 @@
             </div>
         </div>
     {/if}
+    {#if (state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false)}
+            <button class="btn btn-xl variant-filled-error" on:click={triggerReload}>Reload</button>
+        {/if}
 </section>
 
 <section id="action">
