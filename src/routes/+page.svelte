@@ -1,6 +1,5 @@
 <script lang="ts">
-
-    import { fight, init, newRound } from "$lib";
+    import { resolveCombatRound, init, newRound } from "$lib";
 
     let state: any = {
         playerMaxHealth: null,
@@ -16,8 +15,11 @@
         playerLost: false
     };
 
+    let usedWeapons = new Set<string>();
+
     function triggerInit() {
         state = init();
+        usedWeapons = new Set<string>();
     }
 
     function triggerNewRound() {
@@ -28,36 +30,44 @@
             console.error(error);
         }
 
-        if(response !== null) {
+        if (response !== null) {
             state.playerWeapon = response.playerWeapon;
             state.enemyWeapon = response.enemyWeapon;
             state.hasRound = response.hasRound;
             state.hasFought = response.hasFought;
         }
-
     }
 
     function triggerFight() {
         let response = null;
 
         try {        
-            response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
+            response = resolveCombatRound(
+                state.playerCurrentHealth, 
+                state.enemyCurrentHealth, 
+                state.playerWeapon, 
+                state.hasInit, 
+                state.hasRound, 
+                state.hasFought, 
+                state.weaponList, 
+                usedWeapons, 
+                state.rerollCount || 0
+            );
         } catch (error) {
             console.error(error);
         }
 
-        if(response !== null) {
-            state.playerCurrentHealth = response[0];
-            state.enemyCurrentHealth = response[1];
-            state.enemyWeapon = response[2];
-            state.hasFought = response[3];
-            state.playerWon = response[4];
-            state.playerLost = response[5];
+        if (response !== null) {
+            state.playerCurrentHealth = response.playerHealth;
+            state.enemyCurrentHealth = response.enemyHealth;
+            state.enemyWeapon = response.enemyWeapon;
+            state.hasFought = !response.roundContinues;
+            state.playerWon = response.hasWon;
+            state.playerLost = response.hasLost;
+            state.rerollCount = response.rerollCount;
         }
     }
-
 </script>
-
 
 <section id="player" class="w-1/3">
     {#if state.hasInit === true}
@@ -65,8 +75,10 @@
             <div class="flex flex-col items-center justify-center w-full">
                 <h1 class="text-2xl font-bold">Player</h1>
                 <p class="text-lg">Health: {state.playerCurrentHealth} / {state.playerMaxHealth}</p>
-                <p class="text-lg">Weapon name: {state.playerWeapon.name}</p>
-                <p class="text-lg">Weapon description: {state.playerWeapon.description}</p>
+                {#if state.playerWeapon}
+                    <p class="text-lg">Weapon name: {state.playerWeapon.name}</p>
+                    <p class="text-lg">Weapon description: {state.playerWeapon.description}</p>
+                {/if}
             </div>
         </div>
     {/if}
@@ -102,7 +114,7 @@
             <div class="flex flex-col items-center justify-center w-full">
                 <h1 class="text-2xl font-bold">Enemy</h1>
                 <p class="text-lg">Health: {state.enemyCurrentHealth} / {state.enemyMaxHealth}</p>
-                {#if state.enemyWeapon !== null}
+                {#if state.enemyWeapon}
                     <p class="text-lg">Weapon name: {state.enemyWeapon.name}</p>
                     <p class="text-lg">Weapon description: {state.enemyWeapon.description}</p>
                 {/if}

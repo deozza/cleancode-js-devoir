@@ -8,14 +8,13 @@ export function init() {
     let playerCurrentHealth = 10;
     let enemyMaxHealth = 10;
     let enemyCurrentHealth = 10;
-    let playerWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
+    let playerWeapon = weaponList[Math.floor(Math.random() * weaponList.length)] || { name: 'Unknown', description: 'No weapon' };
     let enemyWeapon = null;
     let hasInit = true;
     let hasRound = true;
     let hasFought = false;
     let playerWon = false;
     let playerLost = false;
-    const usedWeapons: Set<string> = new Set(); 
 
     return {
         playerMaxHealth,
@@ -28,18 +27,16 @@ export function init() {
         hasRound,
         hasFought,
         playerWon,
-        playerLost,
-        usedWeapons
+        playerLost
     };
 }
 
 export function newRound(hasInit: boolean) {
     if (hasInit) {
         weaponList = weapons;
-
         return {
             playerWeapon: weaponList[Math.floor(Math.random() * weaponList.length)],
-            enemyWeapon: null,
+            enemyWeapon:null,
             hasRound: true,
             hasFought: false
         };
@@ -51,7 +48,6 @@ export function newRound(hasInit: boolean) {
 interface Weapon {
     name: string;
 }
-
 interface FightResult {
     playerHealth: number;
     enemyHealth: number;
@@ -78,7 +74,6 @@ const weaponDamageMap: Record<string, number | (() => number)> = {
     'darts': () => Math.floor(Math.random() * DARTS_MULTIPLIER),
     'dagger': 3
 };
-
 function calculateDamage(weapon: Weapon): number {
     const damage = weaponDamageMap[weapon.name];
     if (damage === undefined) {
@@ -100,7 +95,6 @@ function updateHealth(
     }
     return [Math.max(0, playerHealth), Math.max(0, enemyHealth)];
 }
-
 export function rerollWeapon(
     currentWeapon: Weapon,
     weaponList: Weapon[],
@@ -110,22 +104,19 @@ export function rerollWeapon(
     if (rerollCount >= MAX_REROLL) {
         throw new Error('Nombre maximum de relances atteint');
     }
-
     const availableWeapons = weaponList.filter(
         (weapon) => !usedWeapons.has(weapon.name)
     );
-
     if (availableWeapons.length === 0) {
         throw new Error('Plus d\'armes disponibles pour la relance');
     }
-
+    weaponList = weapons;
     const newWeapon = availableWeapons[Math.floor(Math.random() * availableWeapons.length)];
     usedWeapons.add(newWeapon.name);
 
     return { newWeapon, updatedRerollCount: rerollCount + 1 };
 }
-
-export function fight(
+export function resolveCombatRound(
     playerHealth: number,
     enemyHealth: number,
     playerWeapon: Weapon,
@@ -149,7 +140,7 @@ export function fight(
     usedWeapons.add(playerWeapon.name);
 
     const playerDamages = calculateDamage(playerWeapon);
-
+    weaponList = weapons;
     const enemyWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
     const enemyDamages = calculateDamage(enemyWeapon);
 
@@ -163,7 +154,6 @@ export function fight(
     const hasWon = updatedEnemyHealth === 0;
     const hasLost = updatedPlayerHealth === 0;
     const roundContinues = !hasWon && !hasLost;
-
     return {
         playerHealth: updatedPlayerHealth,
         enemyHealth: updatedEnemyHealth,

@@ -1,6 +1,6 @@
 Après lecture de la fonction fight je me rends compte qu'il n'est pas bien écrit. 
 
-Plusieurs chose sont à corriger.
+Plusieurs choses sont à corriger.
 
 -Le nom de la fonction est très général selon moi -> Solution:  On devrait mettre un nom plus explicite comme par exemple : resolveCombatRound
 -il y a  beaucoup de commentaires inutiles(les commentaires qui explique les codes sont pas nécessaires) -> Solution : Mettre des commentaires que lorsque c'est nécessaire

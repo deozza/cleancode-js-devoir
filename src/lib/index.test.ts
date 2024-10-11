@@ -1,17 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import {fight, rerollWeapon} from './index';
+import {resolveCombatRound, rerollWeapon} from './index';
 
-
-describe('fight', () => {
+describe('resolveCombatRound', () => {
     it('should resolve the combat round correctly', () => {
         const playerHealth = 10;
         const enemyHealth = 10;
-        const playerWeapon = { name: 'sword' };
+        const playerWeapon = { name: 'sword'};
         const weaponList = [{ name: 'sword' }, { name: 'bow' }, { name: 'dagger' }];
         const usedWeapons: Set<string> = new Set();
         const rerollCount = 0;
 
-        const result = fight(
+        const result = resolveCombatRound(
             playerHealth,
             enemyHealth,
             playerWeapon,
@@ -31,19 +30,19 @@ describe('fight', () => {
     });
 
     it('should throw an error if the game is not initialized', () => {
-        expect(() => fight(
+        expect(() => resolveCombatRound(
             10, 10, { name: 'sword' }, false, true, false, [], new Set(), 0
         )).toThrow('La partie n\'est pas initialisée');
     });
 
     it('should throw an error if the round is not initialized', () => {
-        expect(() => fight(
+        expect(() => resolveCombatRound(
             10, 10, { name: 'sword' }, true, false, false, [], new Set(), 0
         )).toThrow('Le round n\'est pas initialisé');
     });
 
     it('should throw an error if the round has already been played', () => {
-        expect(() => fight(
+        expect(() => resolveCombatRound(
             10, 10, { name: 'sword' }, true, true, true, [], new Set(), 0
         )).toThrow('Le round a déjà été joué');
     });
@@ -80,7 +79,7 @@ describe('fight', () => {
         const rerollCount = 2; 
 
         expect(() => rerollWeapon(currentWeapon, weaponList, usedWeapons, rerollCount))
-            .toThrow('Nombre maximum de relances atteint');
+        .toThrow('Nombre maximum de relances atteint');
     });
 
     it('should throw an error if no weapons are available for reroll', () => {
@@ -90,7 +89,7 @@ describe('fight', () => {
         const rerollCount = 0;
 
         expect(() => rerollWeapon(currentWeapon, weaponList, usedWeapons, rerollCount))
-            .toThrow('Plus d\'armes disponibles pour la relance');
+        .toThrow('Plus d\'armes disponibles pour la relance');
     });
 });
 
