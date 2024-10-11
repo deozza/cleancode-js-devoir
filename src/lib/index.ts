@@ -16,6 +16,7 @@ export function init() {
 	let hasFought = false;
 	let playerWon = false;
 	let playerLost = false;
+	let weaponReload = 0;
 
 	weaponList = weapons;
 
@@ -30,7 +31,8 @@ export function init() {
 		hasRound,
 		hasFought,
 		playerWon,
-		playerLost
+		playerLost,
+		weaponReload
 	};
 }
 
@@ -48,6 +50,22 @@ export function newRound(hasInit: boolean) {
 		throw new Error('Game not initialized');
 	}
 }
+
+export function rerollWeapon(excludedWeapons: any[], maxRerolls: number, currentRerollCount: number): any {
+    if (currentRerollCount >= maxRerolls) {
+        throw new Error('Plus de rerolls disponibles');
+    }
+
+    const availableWeapons = weaponList.filter(w => !excludedWeapons.includes(w));
+    if (availableWeapons.length === 0) {
+        throw new Error('Aucune arme disponible');
+    }
+
+    const newWeapon = availableWeapons[Math.floor(Math.random() * availableWeapons.length)];
+
+    return newWeapon;
+}
+
 
 function randomDamage(baseDamage: number, damageMultiplicator: number) {
 	if (!baseDamage || !damageMultiplicator || baseDamage < 0 || damageMultiplicator < 0) {
@@ -94,7 +112,7 @@ export function fight(
 	playerWeapon: any,
 	hasInit: boolean,
 	hasRound: boolean,
-	hasFought: boolean
+	hasFought: boolean,
 ): Array<number | boolean> {
 	if (!hasInit) {
 		throw new Error('Game not initialized');
