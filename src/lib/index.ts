@@ -1,6 +1,7 @@
 
-import type { E } from 'vitest/dist/chunks/environment.C5eAp3K6.js';
 import weapons from './weaponList.json';
+import { GameState } from './enum';
+
 
 export let weaponList: any[] = [];
 
@@ -20,6 +21,7 @@ export function init() {
     let playerWon = false;
     let playerLost = false;
     let hasReloaded = false;
+    let gameState = GameState.Initialized;
 
     weaponList = weapons;
 
@@ -35,7 +37,8 @@ export function init() {
         hasFought,
         playerWon,
         playerLost,
-        hasReloaded
+        hasReloaded,
+        gameState
     }
 }
 
@@ -47,7 +50,8 @@ export function newRound(hasInit: boolean) {
             playerWeapon: weaponList[Math.floor(Math.random() * weaponList.length)],
             enemyWeapon: null,
             hasRound: true,
-            hasFought: false
+            hasFought: false,
+            gameState: GameState.RoundStarted
         }
     } else {
         throw new Error('Game not initialized');
@@ -145,13 +149,13 @@ export function changingHealthPoint(playerHealth: number, enemyHealth: number, p
 
 export function checkIfOver(playerHealth: number, enemyHealth: number, enemyWeapon: any): any {
     if(enemyHealth === 0) {
-        return [playerHealth, enemyHealth, enemyWeapon, true, true, false, false];
+        return [playerHealth, enemyHealth, enemyWeapon, true, true, false, false, GameState.PlayerWon];
     }
 
     if(playerHealth === 0) {
-        return [playerHealth, enemyHealth, enemyWeapon, true, false, true, false];
+        return [playerHealth, enemyHealth, enemyWeapon, true, false, true, false, GameState.PlayerLost];
     }        
-    return [playerHealth, enemyHealth, enemyWeapon, true, false, false, false];
+    return [playerHealth, enemyHealth, enemyWeapon, true, false, false, false, GameState.Fought];
 }
 
 export function chooseWeapon(): any {

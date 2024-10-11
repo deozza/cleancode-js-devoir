@@ -1,6 +1,9 @@
 <script lang="ts">
 
-    import { fight, init, newRound, reloadWeapon } from "$lib";
+    import { fight, init, newRound, reloadWeapon} from "$lib";
+    import { GameState } from "$lib/enum";
+
+    
 
     let state: any = {
         playerMaxHealth: null,
@@ -14,7 +17,8 @@
         hasFought: false,
         playerWon: false,
         playerLost: false,
-        hasReloaded: false
+        hasReloaded: false,
+        gameState: GameState.NotInitialized
     };
 
     function triggerInit() {
@@ -24,7 +28,7 @@
     function triggerNewRound() {
         let response = null;
         try {        
-            response = newRound(state.hasInit);
+            response = newRound(state.gameState);
         } catch (error) {
             console.error(error);
         }
@@ -34,6 +38,7 @@
             state.enemyWeapon = response.enemyWeapon;
             state.hasRound = response.hasRound;
             state.hasFought = response.hasFought;
+            state.gameState = response.gameState;
         }
 
     }
@@ -55,6 +60,7 @@
             state.playerWon = response[4];
             state.playerLost = response[5];
             state.hasReloaded = response[6];
+            state.gameState = response[7];
         }
     }
 
