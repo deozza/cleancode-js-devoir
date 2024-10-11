@@ -100,18 +100,9 @@ export class Game implements Actor {
     }
 
     fight(): void {
-        if (!this.hasRound) throw new Error('Round not initialized');
-        if (this.hasFought) throw new Error('Round already played');
+        this.assertCanFight();
 
-        const playerWeapon = this.player.weapon;
-        const enemyWeapon = this.enemy.weapon;
-
-        if (!playerWeapon || !enemyWeapon) {
-            throw new Error('Player or enemy weapon not initialized');
-        }
-
-        const playerDamages = playerWeapon.getDamage();
-        const enemyDamages = enemyWeapon.getDamage();
+        const { playerDamages, enemyDamages } = this.getDamages();
 
         this.hasFought = true;
 
@@ -127,12 +118,35 @@ export class Game implements Actor {
             this.player.damage(enemyDamages - playerDamages);
         }
 
-        if (this.enemy.health === 0) {
-            this.playerWon = true;
+        this.determineWinner();
+    }
+
+    private assertCanFight() {
+        if (!this.hasRound) throw new Error('Round not initialized');
+        if (this.hasFought) throw new Error('Round already played');
+    }
+
+    private getDamages() {
+        const playerWeapon = this.player.weapon;
+        const enemyWeapon = this.enemy.weapon;
+
+        if (!playerWeapon || !enemyWeapon) {
+            throw new Error('Player or enemy weapon not initialized');
         }
 
+        const playerDamages = playerWeapon.getDamage();
+        const enemyDamages = enemyWeapon.getDamage();
+
+        return { playerDamages, enemyDamages };
+    }
+
+    private determineWinner(): void {
         if (this.player.health === 0) {
             this.playerLost = true;
+        }
+
+        if (this.enemy.health === 0) {
+            this.playerWon = true;
         }
     }
 }
