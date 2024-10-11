@@ -9,6 +9,8 @@ interface Weapon {
     rarity: string;
 }
 
+const maxRerolls = 2;
+
 export function init() {
     weaponList = weapons;
 
@@ -24,6 +26,7 @@ export function init() {
     let hasFought = false;
     let playerWon = false;
     let playerLost = false;
+    let rerollCount = 0;
 
     weaponList = weapons;
 
@@ -38,7 +41,8 @@ export function init() {
         hasRound,
         hasFought,
         playerWon,
-        playerLost
+        playerLost,
+        rerollCount
     }
 }
 
@@ -56,6 +60,35 @@ export function newRound(hasInit: boolean) {
         throw new Error('Game not initialized');
     }
 }
+
+
+export function rerollWeapon(rerollCount: number, maxRerolls: number, currentWeapon: Weapon): { newWeapon: Weapon, rerollCount: number } {
+    let weaponList = weapons;
+    
+    if (rerollCount >= maxRerolls) {
+        throw new Error('Maximum rerolls reached');
+    }
+
+    const currentWeaponIndex = weaponList.indexOf(currentWeapon);
+    if (currentWeaponIndex > -1) {
+        weaponList.splice(currentWeaponIndex, 1);
+    }
+
+    let newPickedWeapon = getRandomWeapon();
+    while (newPickedWeapon === currentWeapon) {
+        newPickedWeapon = getRandomWeapon();
+    }
+    
+
+    rerollCount += 1;
+
+    return {
+        newWeapon: newPickedWeapon,
+        rerollCount: rerollCount
+    }
+}
+
+
 
 function checkGameState(hasInit: boolean, hasRound: boolean, hasFought: boolean): void {
     if(!hasInit) {
