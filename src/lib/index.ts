@@ -51,21 +51,24 @@ export function newRound(hasInit: boolean) {
 	}
 }
 
-export function rerollWeapon(excludedWeapons: any[], maxRerolls: number, currentRerollCount: number): any {
-    if (currentRerollCount >= maxRerolls) {
-        throw new Error('Plus de rerolls disponibles');
-    }
+export function rerollWeapon(
+	excludedWeapons: any[],
+	maxRerolls: number,
+	currentRerollCount: number
+): any {
+	if (currentRerollCount >= maxRerolls) {
+		throw new Error('Plus de rerolls disponibles');
+	}
 
-    const availableWeapons = weaponList.filter(w => !excludedWeapons.includes(w));
-    if (availableWeapons.length === 0) {
-        throw new Error('Aucune arme disponible');
-    }
+	const availableWeapons = weaponList.filter((w) => !excludedWeapons.includes(w));
+	if (availableWeapons.length === 0) {
+		throw new Error('Aucune arme disponible');
+	}
 
-    const newWeapon = availableWeapons[Math.floor(Math.random() * availableWeapons.length)];
+	const newWeapon = availableWeapons[Math.floor(Math.random() * availableWeapons.length)];
 
-    return newWeapon;
+	return newWeapon;
 }
-
 
 function randomDamage(baseDamage: number, damageMultiplicator: number) {
 	if (!baseDamage || !damageMultiplicator || baseDamage < 0 || damageMultiplicator < 0) {
@@ -77,33 +80,21 @@ function randomDamage(baseDamage: number, damageMultiplicator: number) {
 function calculateDamage(weapon: any): number {
 	let damage = 0;
 
-	switch (weapon.name) {
-		case 'hatchet':
-		case 'knife':
-		case 'spear':
-			damage += 1;
-			break;
-		case 'sword':
-		case 'halberd':
-			damage += 5;
-			break;
-		case 'bow':
-			damage += randomDamage(1, 5);
-			break;
-		case 'crossbow':
-			damage += randomDamage(2, 5);
-			break;
-		case 'darts':
-			damage += randomDamage(1, 3);
-			break;
-		case 'dagger':
-			damage += 3;
-			break;
-		default:
-			throw new Error('Invalid weapon');
-	}
+	if (weapon.multiplicator) {
+		 damage = randomDamage(weapon.basicDamage, weapon.multiplicator);
+	} else {
+        damage = weapon.basicDamage
+    }
 
 	return damage;
+}
+
+function resetWeapons(){
+    weaponList = weapons;
+}
+
+function generateWeaponList(){
+    return weaponList[Math.floor(Math.random() * weaponList.length)]
 }
 
 export function fight(
@@ -112,7 +103,7 @@ export function fight(
 	playerWeapon: any,
 	hasInit: boolean,
 	hasRound: boolean,
-	hasFought: boolean,
+	hasFought: boolean
 ): Array<number | boolean> {
 	if (!hasInit) {
 		throw new Error('Game not initialized');
@@ -128,10 +119,9 @@ export function fight(
 
 	const playerDamages = calculateDamage(playerWeapon);
 
-	// reset weapon list so the enemy could play
-	weaponList = weapons;
+    resetWeapons()
 
-	const enemyWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
+	const enemyWeapon = generateWeaponList();
 	const enemyDamages = calculateDamage(enemyWeapon);
 
 	if (playerDamages === enemyDamages) {
@@ -148,15 +138,12 @@ export function fight(
 	playerHealth = Math.max(0, playerHealth);
 	enemyHealth = Math.max(0, enemyHealth);
 
-	// check if the game is over and the player has won
-	if (enemyHealth === 0) {
-		return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
-	}
-
-	// check if the game is over and the player has lost
-	if (playerHealth === 0) {
-		return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
-	}
-
-	return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
+	return [
+		playerHealth,
+		enemyHealth,
+		enemyWeapon,
+		true,
+		enemyHealth === 0, // le joueur a gagné
+		playerHealth === 0 // le joueur a perdu
+	];
 }

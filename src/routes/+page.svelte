@@ -41,20 +41,20 @@
 		}
 	}
 
-    function triggerRerollWeapon() {
-    if (state.weaponReload < 2) { 
-        try {
-            const newWeapon = rerollWeapon(state.rerolledWeapons); 
-            state.playerWeapon = newWeapon;
-            state.rerolledWeapons.push(newWeapon);
-            state.weaponReload++; 
-        } catch (error) {
-            console.error(error);
-        }
-    } else {
-        console.error("Maximum rerolls reached");
-    }
-}
+	function triggerRerollWeapon() {
+		if (state.weaponReload < 2) {
+			try {
+				const newWeapon = rerollWeapon(state.rerolledWeapons);
+				state.playerWeapon = newWeapon;
+				state.rerolledWeapons.push(newWeapon);
+				state.weaponReload++;
+			} catch (error) {
+				console.error(error);
+			}
+		} else {
+			console.error('Maximum rerolls reached');
+		}
+	}
 
 	function triggerFight() {
 		let response = null;
@@ -86,7 +86,7 @@
 </script>
 
 <section id="player" class="w-1/3">
-	{#if state.hasInit === true}
+	{#if state.hasInit}
 		<div class="flex w-full flex-row flex-wrap items-center justify-between">
 			<div class="flex w-full flex-col items-center justify-center">
 				<h1 class="text-2xl font-bold">Player</h1>
@@ -99,30 +99,30 @@
 </section>
 
 <section id="action">
-	{#if state.hasInit === false}
+	{#if !state.hasInit}
 		<button class="variant-filled-primary btn btn-xl" on:click={triggerInit}>Start</button>
 	{:else}
-		{#if state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === false}
+		{#if state.hasRound && state.hasFought && !state.playerWon && !state.playerLost}
 			<button class="variant-filled-warning btn btn-xl" on:click={triggerNewRound}
 				>Next Round</button
 			>
 		{/if}
 
-		{#if state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false}
+		{#if state.hasRound && !state.hasFought && !state.playerWon && !state.playerLost}
 			<button class="variant-filled-error btn btn-xl" on:click={triggerFight}>Fight</button>
 		{/if}
-        {#if state.weaponReload < 2}
-        <button class="btn btn-xl variant-filled-primary" on:click={triggerRerollWeapon}>
-            Reroll Weapon (Remaining: {2 - state.weaponReload})
-        </button>
-    {/if}
+		{#if state.weaponReload < 2}
+			<button class="variant-filled-primary btn btn-xl" on:click={triggerRerollWeapon}>
+				Reroll Weapon (Remaining: {2 - state.weaponReload})
+			</button>
+		{/if}
 
-		{#if state.hasRound === true && state.hasFought === true && state.playerWon === true && state.playerLost === false}
+		{#if state.hasRound && state.hasFought && state.playerWon && !state.playerLost}
 			<p class="p">You won !</p>
 			<button class="variant-filled-primary btn btn-xl" on:click={triggerInit}>Play again</button>
 		{/if}
 
-		{#if state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === true}
+		{#if state.hasRound && state.hasFought && !state.playerWon && state.playerLost}
 			<p class="p">You lost ...</p>
 			<button class="variant-filled-primary btn btn-xl" on:click={triggerInit}>Play again</button>
 		{/if}
@@ -130,7 +130,7 @@
 </section>
 
 <section id="enemy" class="w-1/3">
-	{#if state.hasInit === true}
+	{#if state.hasInit}
 		<div class="flex w-full flex-row flex-wrap items-center justify-between">
 			<div class="flex w-full flex-col items-center justify-center">
 				<h1 class="text-2xl font-bold">Enemy</h1>
