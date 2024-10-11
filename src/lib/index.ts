@@ -1,4 +1,5 @@
 
+import type { E } from 'vitest/dist/chunks/environment.C5eAp3K6.js';
 import weapons from './weaponList.json';
 
 export let weaponList: any[] = [];
@@ -65,7 +66,7 @@ export function fight(playerHealth: number, enemyHealth: number, playerWeapon: a
         return checkIfOver(playerHealth, enemyHealth, enemyWeapon);
     }
     catch(e: any) {
-        throw new Error(e.message);
+        console.log(e.message);
     }
 }
 
@@ -151,7 +152,7 @@ export function reloadWeapon(userWeapon : any) : any{
         }
         return chooseWeapon();
     }
-    catch(e) {
-        throw new Error('No weapons available')
+    catch(e : any) {
+        console.log(e.message);
     }
 }
