@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import { fight, init, newRound } from "$lib";
+    import { fight, init, newRound, rerollWeapon } from "$lib";
 
     let state: any = {
         playerMaxHealth: null,
@@ -13,7 +13,8 @@
         hasRound: false,
         hasFought: false,
         playerWon: false,
-        playerLost: false
+        playerLost: false,
+        rerolls : null
     };
 
     function triggerInit() {
@@ -22,7 +23,7 @@
 
     function triggerNewRound() {
         let response = null;
-        try {        
+        try {
             response = newRound(state.hasInit);
         } catch (error) {
             console.error(error);
@@ -33,6 +34,7 @@
             state.enemyWeapon = response.enemyWeapon;
             state.hasRound = response.hasRound;
             state.hasFought = response.hasFought;
+            state.rerolls = response.rerolls;
         }
 
     }
@@ -40,7 +42,7 @@
     function triggerFight() {
         let response = null;
 
-        try {        
+        try {
             response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
         } catch (error) {
             console.error(error);
@@ -54,6 +56,22 @@
             state.playerWon = response[4];
             state.playerLost = response[5];
         }
+    }
+
+    function triggerReroll() {
+        let response = null;
+
+        try {
+            response = rerollWeapon(state.rerolls, state.playerWeapon);
+        } catch (error) {
+            console.error(error);
+        }
+
+        if(response !== null) {
+            state.rerolls = response[0];
+            state.playerWeapon = response[1];
+        }
+
     }
 
 </script>
@@ -80,7 +98,14 @@
             <button class="btn btn-xl variant-filled-warning" on:click={triggerNewRound}>Next Round</button>
         {/if}
 
-        {#if (state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false)}
+        {#if (state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false && state.rerolls > 0)}
+            <button class="btn btn-xl variant-filled-error" on:click={triggerFight}>Fight</button>
+            <br>
+            <p class="text-md">Rerolls left: {state.rerolls}</p>
+            <button class="btn btn-xl variant-filled-success" on:click={triggerReroll}>Reroll</button>
+        {/if}
+
+        {#if (state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false && state.rerolls === 0)}
             <button class="btn btn-xl variant-filled-error" on:click={triggerFight}>Fight</button>
         {/if}
 

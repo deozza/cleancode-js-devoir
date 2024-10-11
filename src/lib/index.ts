@@ -19,6 +19,8 @@ export function init() {
     let playerWon = false;
     let playerLost = false;
 
+    let rerolls = 3;
+
     weaponList = weapons;
 
     return {
@@ -32,7 +34,8 @@ export function init() {
         hasRound,
         hasFought,
         playerWon,
-        playerLost
+        playerLost,
+        rerolls
     }
 }
 
@@ -44,7 +47,8 @@ export function newRound(hasInit: boolean) {
             playerWeapon: weaponList[Math.floor(Math.random() * weaponList.length)],
             enemyWeapon: null,
             hasRound: true,
-            hasFought: false
+            hasFought: false,
+            rerolls: 3
         }
     } else {
         throw new Error('Game not initialized');
@@ -131,4 +135,16 @@ function damageHandler(playerDamages: number, enemyDamages: number, playerHealth
     }
 
     return [playerHealth, enemyHealth];
+}
+
+export function rerollWeapon(rerolls: number, playerWeapon: any){
+    if(rerolls <= 0) {
+        throw new Error('No rerolls left');
+    }
+    rerolls--;
+
+    weaponList = weapons.filter(weapon => weapon.name !== playerWeapon.name);
+    playerWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
+
+    return [rerolls, playerWeapon];
 }
