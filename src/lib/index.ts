@@ -57,26 +57,8 @@ export function fight(playerHealth: number, enemyHealth: number, playerWeapon: a
     let enemyWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
     let enemyDamages = calculateDamage(enemyWeapon.name);
 
-    if(playerDamages === enemyDamages) {
-        return [playerHealth, enemyHealth];
-    }
-            
-    if(playerDamages > enemyDamages) {
-        enemyHealth -= playerDamages - enemyDamages;
-    } else {
-        playerHealth -= enemyDamages - playerDamages;
-    }
-           
-    // health cannot be negative
-    if(playerHealth <= 0) {
-        playerHealth = 0;
-    }
-            
-    // health cannot be negative
-    if(enemyHealth <= 0) {
-        enemyHealth = 0;
-    }
-                
+    [playerHealth, enemyHealth] = changingHealthPoint(playerHealth, enemyHealth, playerDamages, enemyDamages);
+    
     // check if the game is over and the player has won
     if(enemyHealth === 0) {
         return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
@@ -123,4 +105,25 @@ export function calculateDamage(weapon: string): number {
     }
 
     return typeof damage === 'function' ? damage() : damage;
+}
+
+export function changingHealthPoint(playerHealth: number, enemyHealth: number, playerDamages: number, enemyDamages: number): Array<number> {
+    if(playerDamages === enemyDamages) {
+        return [playerHealth, enemyHealth];
+    }
+            
+    if(playerDamages > enemyDamages) {
+        enemyHealth -= playerDamages - enemyDamages;
+    } else {
+        playerHealth -= enemyDamages - playerDamages;
+    }
+           
+    if(playerHealth <= 0) {
+        playerHealth = 0;
+    }
+            
+    if(enemyHealth <= 0) {
+        enemyHealth = 0;
+    }
+    return [playerHealth, enemyHealth];
 }
