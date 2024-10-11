@@ -53,72 +53,41 @@ export function newRound(hasInit: boolean) {
 
 export function fight(playerHealth: number, enemyHealth: number, playerWeapon: any, hasInit: boolean, hasRound: boolean, hasFought: boolean): Array<number|boolean> {
     checkInitialConditions(hasInit, hasRound, hasFought);
-    let enemyDamages: number = 0;
     let playerDamages = calculateDamage(playerWeapon.name);
-    console.log('playerDamages', playerDamages);
-        // reset weapon list so the enemy could play
-        weaponList = weapons;
-            
-        let enemyWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
-        console.log('enemyWeapon', enemyWeapon);
-            
-        switch (enemyWeapon.name) {
-            case 'hatchet':
-            case 'knife':
-            case 'spear':
-                enemyDamages += 1;
-                break;
-            case 'sword':
-            case 'halberd': 
-                enemyDamages += 5;
-                break;
-            case 'bow':
-                enemyDamages += 1 * (Math.floor(Math.random() * 5));
-                break;
-            case 'crossbow':
-                enemyDamages += 2 * (Math.floor(Math.random() * 5));
-                break
-            case 'darts':
-                enemyDamages += 1 * (Math.floor(Math.random() * 3));
-                break;
-            case 'dagger':
-                enemyDamages += 3;
-                break;
-            default:
-                throw new Error('Invalid weapon');
-            }
+    let enemyWeapon = weaponList[Math.floor(Math.random() * weaponList.length)];
+    let enemyDamages = calculateDamage(enemyWeapon.name);
 
-            if(playerDamages === enemyDamages) {
-                return [playerHealth, enemyHealth];
-            }
+    if(playerDamages === enemyDamages) {
+        return [playerHealth, enemyHealth];
+    }
             
-            if(playerDamages > enemyDamages) {
-                enemyHealth -= playerDamages - enemyDamages;
-            } else {
-                playerHealth -= enemyDamages - playerDamages;
-            }
+    if(playerDamages > enemyDamages) {
+        enemyHealth -= playerDamages - enemyDamages;
+    } else {
+        playerHealth -= enemyDamages - playerDamages;
+    }
            
-                // health cannot be negative
-            if(playerHealth <= 0) {
-                playerHealth = 0;
-            }
+    // health cannot be negative
+    if(playerHealth <= 0) {
+        playerHealth = 0;
+    }
             
-                // health cannot be negative
-            if(enemyHealth <= 0) {
-                enemyHealth = 0;
-            }
+    // health cannot be negative
+    if(enemyHealth <= 0) {
+        enemyHealth = 0;
+    }
                 
-                // check if the game is over and the player has won
-            if(enemyHealth === 0) {
-                return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
-            }
+    // check if the game is over and the player has won
+    if(enemyHealth === 0) {
+        return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
+    }
 
 
-                // check if the game is over and the player has lost
-            if(playerHealth === 0) {
-                return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
-            }        
-            return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
+    // check if the game is over and the player has lost
+    if(playerHealth === 0) {
+        return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
+    }        
+    return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
 }
 
 
