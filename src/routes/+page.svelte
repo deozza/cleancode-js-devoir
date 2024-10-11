@@ -3,6 +3,7 @@
     import { fight, init, newRound, reloadWeapon} from "$lib";
     import { GameState } from "$lib/enum";
 
+
     
 
     let state: any = {
@@ -32,7 +33,6 @@
         } catch (error) {
             console.error(error);
         }
-
         if(response !== null) {
             state.playerWeapon = response.playerWeapon;
             state.enemyWeapon = response.enemyWeapon;
@@ -47,7 +47,7 @@
         let response = null;
 
         try {        
-            response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
+            response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought, state.gameState);
         } catch (error) {
             console.error(error);
         }
@@ -108,12 +108,12 @@
             <button class="btn btn-xl variant-filled-error" on:click={triggerFight}>Fight</button>
         {/if}
 
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === true && state.playerLost === false)}
+        {#if (GameState.PlayerWon === state.gameState)}
             <p class="p">You won !</p>
             <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
         {/if}
 
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === true)}
+        {#if (state.gameState === GameState.PlayerLost)}
             <p class="p">You lost ...</p>
             <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
         {/if}

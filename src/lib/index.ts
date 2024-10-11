@@ -42,8 +42,8 @@ export function init() {
     }
 }
 
-export function newRound(hasInit: boolean) {
-    if(hasInit) {
+export function newRound(gameState: GameState) {
+    if(gameState === GameState.Initialized) {
         weaponList = weapons;
 
         return {
@@ -58,9 +58,9 @@ export function newRound(hasInit: boolean) {
     }
 }
 
-export function fight(playerHealth: number, enemyHealth: number, playerWeapon: any, hasInit: boolean, hasRound: boolean, hasFought: boolean): Array<number|boolean> {
+export function fight(playerHealth: number, enemyHealth: number, playerWeapon: any, hasInit: boolean, hasRound: boolean, hasFought: boolean, gameState : GameState): Array<number|boolean> {
     try {
-        checkInitialConditions(hasInit, hasRound, hasFought);
+        checkInitialConditions(hasInit, hasRound, hasFought, gameState);
         let playerDamages = calculateDamage(playerWeapon.name);
         let enemyWeapon = chooseWeapon()
         let enemyDamages = calculateDamage(enemyWeapon.name);
@@ -75,7 +75,7 @@ export function fight(playerHealth: number, enemyHealth: number, playerWeapon: a
 }
 
 
-export function checkInitialConditions(hasInit: boolean, hasRound: boolean, hasFought: boolean): void {
+export function checkInitialConditions(hasInit: boolean, hasRound: boolean, hasFought: boolean, gameState : GameState): void {
     try {
         isGameInit(hasInit);
         isRoundInit(hasRound);
@@ -155,7 +155,7 @@ export function checkIfOver(playerHealth: number, enemyHealth: number, enemyWeap
     if(playerHealth === 0) {
         return [playerHealth, enemyHealth, enemyWeapon, true, false, true, false, GameState.PlayerLost];
     }        
-    return [playerHealth, enemyHealth, enemyWeapon, true, false, false, false, GameState.Fought];
+    return [playerHealth, enemyHealth, enemyWeapon, true, false, false, false, GameState.Initialized];
 }
 
 export function chooseWeapon(): any {
