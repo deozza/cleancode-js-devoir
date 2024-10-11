@@ -15,12 +15,12 @@
 
     function triggerInit() {
         game = new Game();
-        game.newRound();
+        game.startNewRound();
         rerender();
     }
 
     function triggerNewRound() {
-        game!.newRound();
+        game!.startNewRound();
         rerender();
     }
 

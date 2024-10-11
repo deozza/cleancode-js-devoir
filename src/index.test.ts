@@ -5,7 +5,7 @@ let game: Game = null!;
 
 beforeEach(() => {
 	game = new Game();
-	game.newRound();
+	game.startNewRound();
 })
 
 describe('game test', () => {

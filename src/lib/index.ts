@@ -9,7 +9,7 @@ import { SpearWeapon } from './weapons/spear-weapon';
 import { SwordWeapon } from './weapons/sword-weapon';
 
 interface Actor {
-    newRound(): void;
+    startNewRound(): void;
 }
 
 class Player implements Actor {
@@ -30,7 +30,7 @@ class Player implements Actor {
         this.resetWeaponList();
     }
 
-    damage(damage: number) {
+    applyDamage(damage: number) {
         this.health -= damage;
         if (this.health < 0) {
             this.health = 0;
@@ -47,7 +47,7 @@ class Player implements Actor {
         this.rerollCount++;
     }
 
-    newRound(): void {
+    startNewRound(): void {
         this.resetRerollCount();
         this.takeRandomWeapon();
     }
@@ -92,11 +92,11 @@ export class Game implements Actor {
     playerWon = false;
     playerLost = false;
 
-    newRound() {
+    startNewRound() {
         this.hasRound = true;
         this.hasFought = false;
-        this.player.newRound();
-        this.enemy.newRound();
+        this.player.startNewRound();
+        this.enemy.startNewRound();
     }
 
     fight(): void {
@@ -111,11 +111,11 @@ export class Game implements Actor {
         }
 
         if (playerDamages > enemyDamages) {
-            this.enemy.damage(playerDamages - enemyDamages);
+            this.enemy.applyDamage(playerDamages - enemyDamages);
         }
 
         if (playerDamages < enemyDamages) {
-            this.player.damage(enemyDamages - playerDamages);
+            this.player.applyDamage(enemyDamages - playerDamages);
         }
 
         this.determineWinner();
