@@ -28,6 +28,4 @@ Ici, une simple suppression des commentaires inutiles fera l'affaire.
 
 
 ### Autre problème noté au test du jeu:
-- Pas d'écran ni de message d'explication de fin de partie (victoire ou défaite, pas d'update des hp au dernier tour qui n'a plus d'hp ?)
-- Je retire ce que je viens de dire juste au-dessus, en refaisaant des tests j'ai réussi à avoir des écrans de fin de partie mais du coup j'ai eu beaucoup de crash de parties, notammenent des fois ou l'arme ne s'affichait pas pour l'adversaire.
-
+- Lorsque l'on joue trop vite le jeu n'arrive pas toujours à actualiser les points de vie de l'adversaire ou encore son arme.

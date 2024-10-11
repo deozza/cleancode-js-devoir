@@ -77,46 +77,20 @@ export function fight(playerHealth: number, enemyHealth: number, playerWeapon: a
 
     enemyDamages += getWeaponDamages(enemyWeapon);
 
+    [playerHealth, enemyHealth] = damageHandler(playerDamages, enemyDamages, playerHealth, enemyHealth);
 
-    if(playerDamages === enemyDamages) {
-        return [playerHealth, enemyHealth];
-    }
-
-    if(playerDamages > enemyDamages) {
-        enemyHealth -= playerDamages - enemyDamages;
-    } else {
-        playerHealth -= enemyDamages - playerDamages;
-    }
-
-    // health cannot be negative
-    if(playerHealth <= 0) {
-        playerHealth = 0;
-    }
-
-    // health cannot be negative
-    if(enemyHealth <= 0) {
-        enemyHealth = 0;
-    }
-
-    // check if the game is over and the player has won
     if(enemyHealth === 0) {
         return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
     }
 
-
-    // check if the game is over and the player has lost
     if(playerHealth === 0) {
         return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
     }
 
     return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
-
-
-
 }
 
-
-export function getWeaponDamages(weapon){
+function getWeaponDamages(weapon){
     const weaponsDamages = {
         'hatchet': () => 1,
         'knife': () => 1,
@@ -135,4 +109,26 @@ export function getWeaponDamages(weapon){
     } else {
         throw new Error('Invalid weapon');
     }
+}
+
+function damageHandler(playerDamages: number, enemyDamages: number, playerHealth: number, enemyHealth: number) {
+    if(playerDamages === enemyDamages) {
+        return [playerHealth, enemyHealth];
+    }
+
+    if(playerDamages > enemyDamages) {
+        enemyHealth -= playerDamages - enemyDamages;
+    } else {
+        playerHealth -= enemyDamages - playerDamages;
+    }
+
+    if(playerHealth <= 0) {
+        playerHealth = 0;
+    }
+
+    if(enemyHealth <= 0) {
+        enemyHealth = 0;
+    }
+
+    return [playerHealth, enemyHealth];
 }
