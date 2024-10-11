@@ -1,6 +1,8 @@
 export interface Weapon {
 	name: string;
 	damage: number | (() => number);
+	rarity: string;
+	description: string;
 }
 
 export interface Fighter {
