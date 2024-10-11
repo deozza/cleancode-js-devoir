@@ -132,13 +132,21 @@ export function checkIfOver(playerHealth: number, enemyHealth: number, enemyWeap
 }
 
 export function chooseWeapon(): any {
+    if(weaponList.length === 0) {
+        throw new Error('No weapons available');
+    }
     return weaponList[Math.floor(Math.random() * weaponList.length)];
 }
 
 export function reloadWeapon(userWeapon : any) : any{
-    let newWeapon = chooseWeapon();
-    if(newWeapon.name === userWeapon.name) {
-        return reloadWeapon(userWeapon);
+    try {
+        let newWeapon = chooseWeapon();
+        if(newWeapon.name === userWeapon.name) {
+            return reloadWeapon(userWeapon);
+        }
+        return chooseWeapon();
     }
-    return chooseWeapon();
+    catch(e) {
+        throw new Error('No weapons available')
+    }
 }
