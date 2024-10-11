@@ -1,4 +1,4 @@
-import type { Weapon } from "./gameType";
+import type { Weapon } from './gameType';
 
 export const WEAPONS: { [key: string]: Weapon } = {
 	hatchet: {
@@ -19,7 +19,7 @@ export const WEAPONS: { [key: string]: Weapon } = {
 		rarity: 'common',
 		description: 'Deals 1 damage to the enemy.'
 	},
-	sword: { name: 'Sword', damage: 5, rarity: 'rare', description: "Deals 5 damage to the enemy." },
+	sword: { name: 'Sword', damage: 5, rarity: 'rare', description: 'Deals 5 damage to the enemy.' },
 	halberd: {
 		name: 'Halberd',
 		damage: 5,
