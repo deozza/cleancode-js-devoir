@@ -87,10 +87,10 @@
             <div class="flex flex-row items-center justify-between flex-wrap w-full">
                 <div class="flex flex-col items-center justify-center w-full">
                     <h1 class="text-2xl font-bold">Enemy</h1>
-                    <p class="text-lg text-center">Health: {game?.enemy.health} / {game?.enemy.maxHealth}</p>
+                    <p class="text-lg text-center"><strong>Health:</strong> {game?.enemy.health} / {game?.enemy.maxHealth}</p>
                     {#if game?.enemy.weapon !== null}
-                        <p class="text-lg text-center">Weapon name: {game?.enemy.weapon?.name}</p>
-                        <p class="text-lg text-center">Weapon description: {game?.enemy.weapon?.description}</p>
+                        <p class="text-lg text-center"><strong>Weapon name:</strong> {game?.enemy.weapon?.name}</p>
+                        <p class="text-lg text-center"><strong>Weapon description:</strong> {game?.enemy.weapon?.description}</p>
                     {/if}
                 </div>
             </div>
