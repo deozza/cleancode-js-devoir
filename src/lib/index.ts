@@ -8,16 +8,33 @@ import { KnifeWeapon } from './weapons/knife-weapon';
 import { SpearWeapon } from './weapons/spear-weapon';
 import { SwordWeapon } from './weapons/sword-weapon';
 
+class Player {
+    health: number;
+    maxHealth: number;
+    weapon: Weapon | null;
+
+    constructor(player: { [key in keyof Player]: Player[key] }) {
+        this.health = player.health;
+        this.maxHealth = player.maxHealth;
+        this.weapon = player.weapon;
+    }
+}
+
 export class Game {
-    playerMaxHealth = 10;
-    playerCurrentHealth = 10;
-    enemyMaxHealth = 10;
-    enemyCurrentHealth = 10;
-    playerWeapon = this.getRandomWeapon();
-    enemyWeapon = null;
-    hasInit = true;
+    player = new Player({
+        health: 10,
+        maxHealth: 10,
+        weapon: this.getRandomWeapon()
+    });
+    enemy = new Player({
+        health: 10,
+        maxHealth: 10,
+        weapon: this.getRandomWeapon()
+    });
+
     hasRound = true;
     hasFought = false;
+
     playerWon = false;
     playerLost = false;
 
@@ -67,36 +84,36 @@ export class Game {
         enemyDamages += enemyWeapon.getDamage();
 
         if (playerDamages === enemyDamages) {
-            return [this.playerCurrentHealth, this.enemyCurrentHealth];
+            return [this.player.health, this.enemy.health];
         }
 
         if (playerDamages > enemyDamages) {
-            this.enemyCurrentHealth -= playerDamages - enemyDamages;
+            this.enemy.health -= playerDamages - enemyDamages;
         } else {
-            this.playerCurrentHealth -= enemyDamages - playerDamages;
+            this.player.health -= enemyDamages - playerDamages;
         }
 
         // health cannot be negative
-        if (this.playerCurrentHealth <= 0) {
-            this.playerCurrentHealth = 0;
+        if (this.player.health <= 0) {
+            this.player.health = 0;
         }
 
         // health cannot be negative
-        if (this.enemyCurrentHealth <= 0) {
-            this.enemyCurrentHealth = 0;
+        if (this.enemy.health <= 0) {
+            this.enemy.health = 0;
         }
 
         // check if the game is over and the player has won
-        if (this.enemyCurrentHealth === 0) {
-            return [this.playerCurrentHealth, this.enemyCurrentHealth, enemyWeapon, true, true, false];
+        if (this.enemy.health === 0) {
+            return [this.player.health, this.enemy.health, enemyWeapon, true, true, false];
         }
 
 
         // check if the game is over and the player has lost
-        if (this.playerCurrentHealth === 0) {
-            return [this.playerCurrentHealth, this.enemyCurrentHealth, enemyWeapon, true, false, true];
+        if (this.player.health === 0) {
+            return [this.player.health, this.enemy.health, enemyWeapon, true, false, true];
         }
 
-        return [this.playerCurrentHealth, this.enemyCurrentHealth, enemyWeapon, true, false, false];
+        return [this.player.health, this.enemy.health, enemyWeapon, true, false, false];
     }
 }
