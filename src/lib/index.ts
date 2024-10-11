@@ -58,18 +58,8 @@ export function fight(playerHealth: number, enemyHealth: number, playerWeapon: a
     let enemyDamages = calculateDamage(enemyWeapon.name);
 
     [playerHealth, enemyHealth] = changingHealthPoint(playerHealth, enemyHealth, playerDamages, enemyDamages);
-    
-    // check if the game is over and the player has won
-    if(enemyHealth === 0) {
-        return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
-    }
 
-
-    // check if the game is over and the player has lost
-    if(playerHealth === 0) {
-        return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
-    }        
-    return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
+    return checkIfOver(playerHealth, enemyHealth, enemyWeapon);
 }
 
 
@@ -126,4 +116,15 @@ export function changingHealthPoint(playerHealth: number, enemyHealth: number, p
         enemyHealth = 0;
     }
     return [playerHealth, enemyHealth];
+}
+
+export function checkIfOver(playerHealth: number, enemyHealth: number, enemyWeapon: any): any {
+    if(enemyHealth === 0) {
+        return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
+    }
+
+    if(playerHealth === 0) {
+        return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
+    }        
+    return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
 }
