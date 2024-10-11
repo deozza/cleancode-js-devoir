@@ -1,112 +1,57 @@
 <script lang="ts">
+    import { fight, init, newRound } from "../lib/index";
+    import type { GameState } from "../types/gameType"
 
-    import { fight, init, newRound } from "$lib";
+    let gameState: GameState = init();
 
-    let state: any = {
-        playerMaxHealth: null,
-        playerCurrentHealth: null,
-        enemyMaxHealth: null,
-        enemyCurrentHealth: null,
-        playerWeapon: null,
-        enemyWeapon: null,
-        hasInit: false,
-        hasRound: false,
-        hasFought: false,
-        playerWon: false,
-        playerLost: false
-    };
-
-    function triggerInit() {
-        state = init();
+    function enableNewRound() {
+        gameState = newRound(gameState);
     }
 
-    function triggerNewRound() {
-        let response = null;
-        try {        
-            response = newRound(state.hasInit);
-        } catch (error) {
-            console.error(error);
-        }
-
-        if(response !== null) {
-            state.playerWeapon = response.playerWeapon;
-            state.enemyWeapon = response.enemyWeapon;
-            state.hasRound = response.hasRound;
-            state.hasFought = response.hasFought;
-        }
-
+    function enableFight() {
+        gameState = fight(gameState);
     }
 
-    function triggerFight() {
-        let response = null;
-
-        try {        
-            response = fight(state.playerCurrentHealth, state.enemyCurrentHealth, state.playerWeapon, state.hasInit, state.hasRound, state.hasFought);
-        } catch (error) {
-            console.error(error);
-        }
-
-        if(response !== null) {
-            state.playerCurrentHealth = response[0];
-            state.enemyCurrentHealth = response[1];
-            state.enemyWeapon = response[2];
-            state.hasFought = response[3];
-            state.playerWon = response[4];
-            state.playerLost = response[5];
-        }
+    function resetGame() {
+        gameState = init();
     }
-
 </script>
 
 
 <section id="player" class="w-1/3">
-    {#if state.hasInit === true}
-        <div class="flex flex-row items-center justify-between flex-wrap w-full">
-            <div class="flex flex-col items-center justify-center w-full">
-                <h1 class="text-2xl font-bold">Player</h1>
-                <p class="text-lg">Health: {state.playerCurrentHealth} / {state.playerMaxHealth}</p>
-                <p class="text-lg">Weapon name: {state.playerWeapon.name}</p>
-                <p class="text-lg">Weapon description: {state.playerWeapon.description}</p>
-            </div>
+    <div class="flex flex-row items-center justify-between flex-wrap w-full">
+        <div class="flex flex-col items-center justify-center w-full">
+            <h1 class="text-2xl font-bold">Player</h1>
+            <p class="text-lg">Health: {gameState.player.currentHealth} / {gameState.player.maxHealth}</p>
+            <p class="text-lg">Weapon name: {gameState.player.weapon.name}</p>
+            <p class="text-lg">Weapon description: {gameState.player.weapon.description}</p>
         </div>
-    {/if}
+    </div>
 </section>
 
 <section id="action">
-    {#if state.hasInit === false}
-        <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Start</button>
+    {#if gameState.isGameOver}
+        {#if gameState.winner === 'player'}
+            <p class="p">You won!</p>
+        {:else if gameState.winner === 'enemy'}
+            <p class="p">You lost...</p>
+        {/if}
+        <button class="btn btn-xl variant-filled-primary" on:click={resetGame}>Play again</button>
     {:else}
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === false)}
-            <button class="btn btn-xl variant-filled-warning" on:click={triggerNewRound}>Next Round</button>
+        {#if gameState.round > 1}
+            <button class="btn btn-xl variant-filled-warning" on:click={enableNewRound}>Next Round</button>
         {/if}
-
-        {#if (state.hasRound === true && state.hasFought === false && state.playerWon === false && state.playerLost === false)}
-            <button class="btn btn-xl variant-filled-error" on:click={triggerFight}>Fight</button>
-        {/if}
-
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === true && state.playerLost === false)}
-            <p class="p">You won !</p>
-            <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
-        {/if}
-
-        {#if (state.hasRound === true && state.hasFought === true && state.playerWon === false && state.playerLost === true)}
-            <p class="p">You lost ...</p>
-            <button class="btn btn-xl variant-filled-primary" on:click={triggerInit}>Play again</button>
-        {/if}
+        <button class="btn btn-xl variant-filled-error" on:click={enableFight}>Fight</button>
     {/if}
 </section>
 
 <section id="enemy" class="w-1/3">
-    {#if state.hasInit === true}
-        <div class="flex flex-row items-center justify-between flex-wrap w-full">
-            <div class="flex flex-col items-center justify-center w-full">
-                <h1 class="text-2xl font-bold">Enemy</h1>
-                <p class="text-lg">Health: {state.enemyCurrentHealth} / {state.enemyMaxHealth}</p>
-                {#if state.enemyWeapon !== null}
-                    <p class="text-lg">Weapon name: {state.enemyWeapon.name}</p>
-                    <p class="text-lg">Weapon description: {state.enemyWeapon.description}</p>
-                {/if}
-            </div>
+    <div class="flex flex-row items-center justify-between flex-wrap w-full">
+        <div class="flex flex-col items-center justify-center w-full">
+            <h1 class="text-2xl font-bold">Enemy</h1>
+            <p class="text-lg">Health: {gameState.enemy.currentHealth} / {gameState.enemy.maxHealth}</p>
+            <p class="text-lg">Weapon name: {gameState.enemy.weapon.name}</p>
+            <p class="text-lg">Weapon description: {gameState.enemy.weapon.description}</p>
         </div>
-    {/if}
+    </div>
 </section>
