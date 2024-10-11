@@ -13,10 +13,20 @@ class Player {
     maxHealth: number;
     weapon: Weapon | null;
 
-    constructor(player: { [key in keyof Player]: Player[key] }) {
+    constructor(player: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key in keyof Player as Player[key] extends (...args: any[]) => any ? never : key]: Player[key]
+    }) {
         this.health = player.health;
         this.maxHealth = player.maxHealth;
         this.weapon = player.weapon;
+    }
+
+    damage(damage: number) {
+        this.health -= damage;
+        if (this.health < 0) {
+            this.health = 0;
+        }
     }
 }
 
@@ -56,24 +66,16 @@ export class Game {
         return weaponList[Math.floor(Math.random() * weaponList.length)];
     }
 
-    newRound(hasInit: boolean) {
-        if (!hasInit) throw new Error('Game not initialized');
-
-        return {
-            playerWeapon: this.getRandomWeapon(),
-            enemyWeapon: null,
-            hasRound: true,
-            hasFought: false
-        }
+    newRound() {
+        this.player.weapon = this.getRandomWeapon();
+        this.enemy.weapon = null;
+        this.hasRound = true;
+        this.hasFought = false;
     }
 
-    fight(
-        playerWeapon: Weapon,
-        hasRound: boolean,
-        hasFought: boolean
-    ): Array<number | boolean> {
-        if (!hasRound) throw new Error('Round not initialized');
-        if (hasFought) throw new Error('Round already played');
+    fight(playerWeapon: Weapon): void {
+        if (!this.hasRound) throw new Error('Round not initialized');
+        if (this.hasFought) throw new Error('Round already played');
 
         let playerDamages: number = 0;
         let enemyDamages: number = 0;
@@ -84,36 +86,25 @@ export class Game {
         enemyDamages += enemyWeapon.getDamage();
 
         if (playerDamages === enemyDamages) {
-            return [this.player.health, this.enemy.health];
+            return;
         }
 
         if (playerDamages > enemyDamages) {
-            this.enemy.health -= playerDamages - enemyDamages;
-        } else {
-            this.player.health -= enemyDamages - playerDamages;
+            this.enemy.damage(playerDamages - enemyDamages);
         }
 
-        // health cannot be negative
-        if (this.player.health <= 0) {
-            this.player.health = 0;
+        if (playerDamages < enemyDamages) {
+            this.player.damage(enemyDamages - playerDamages);
         }
 
-        // health cannot be negative
-        if (this.enemy.health <= 0) {
-            this.enemy.health = 0;
-        }
+        this.hasFought = true;
 
-        // check if the game is over and the player has won
         if (this.enemy.health === 0) {
-            return [this.player.health, this.enemy.health, enemyWeapon, true, true, false];
+            this.playerWon = true;
         }
 
-
-        // check if the game is over and the player has lost
         if (this.player.health === 0) {
-            return [this.player.health, this.enemy.health, enemyWeapon, true, false, true];
+            this.playerLost = true;
         }
-
-        return [this.player.health, this.enemy.health, enemyWeapon, true, false, false];
     }
 }
