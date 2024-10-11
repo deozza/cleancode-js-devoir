@@ -113,6 +113,8 @@ export class Game implements Actor {
         const playerDamages = playerWeapon.getDamage();
         const enemyDamages = enemyWeapon.getDamage();
 
+        this.hasFought = true;
+
         if (playerDamages === enemyDamages) {
             return;
         }
@@ -124,8 +126,6 @@ export class Game implements Actor {
         if (playerDamages < enemyDamages) {
             this.player.damage(enemyDamages - playerDamages);
         }
-
-        this.hasFought = true;
 
         if (this.enemy.health === 0) {
             this.playerWon = true;

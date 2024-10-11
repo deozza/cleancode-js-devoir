@@ -20,18 +20,17 @@
     }
 
     function triggerNewRound() {
-        game?.newRound();
+        game!.newRound();
         rerender();
     }
 
     function triggerFight() {
-        try {        
-            game?.fight();
+        try {
+            game!.fight();
         } catch (error) {
             console.error(error);
-        } finally {
-            rerender();
         }
+        rerender();
     }
 
     function triggerRerollPlayerWeapon() {
