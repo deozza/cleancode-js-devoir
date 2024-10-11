@@ -19,7 +19,6 @@
 
     function triggerInit() {
         state = init();
-        console.log(state);
     }
 
     function triggerNewRound() {

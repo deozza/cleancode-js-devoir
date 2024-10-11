@@ -54,14 +54,19 @@ export function newRound(hasInit: boolean) {
 }
 
 export function fight(playerHealth: number, enemyHealth: number, playerWeapon: any, hasInit: boolean, hasRound: boolean, hasFought: boolean): Array<number|boolean> {
-    checkInitialConditions(hasInit, hasRound, hasFought);
-    let playerDamages = calculateDamage(playerWeapon.name);
-    let enemyWeapon = chooseWeapon()
-    let enemyDamages = calculateDamage(enemyWeapon.name);
+    try {
+        checkInitialConditions(hasInit, hasRound, hasFought);
+        let playerDamages = calculateDamage(playerWeapon.name);
+        let enemyWeapon = chooseWeapon()
+        let enemyDamages = calculateDamage(enemyWeapon.name);
 
-    [playerHealth, enemyHealth] = changingHealthPoint(playerHealth, enemyHealth, playerDamages, enemyDamages);
+        [playerHealth, enemyHealth] = changingHealthPoint(playerHealth, enemyHealth, playerDamages, enemyDamages);
 
-    return checkIfOver(playerHealth, enemyHealth, enemyWeapon);
+        return checkIfOver(playerHealth, enemyHealth, enemyWeapon);
+    }
+    catch(e: any) {
+        throw new Error(e.message);
+    }
 }
 
 
