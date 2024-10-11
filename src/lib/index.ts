@@ -9,6 +9,18 @@ import { SpearWeapon } from './weapons/spear-weapon';
 import { SwordWeapon } from './weapons/sword-weapon';
 
 export class Game {
+    playerMaxHealth = 10;
+    playerCurrentHealth = 10;
+    enemyMaxHealth = 10;
+    enemyCurrentHealth = 10;
+    playerWeapon = this.getRandomWeapon();
+    enemyWeapon = null;
+    hasInit = true;
+    hasRound = true;
+    hasFought = false;
+    playerWon = false;
+    playerLost = false;
+
     private getWeaponList(): Weapon[] {
         return [
             new BowWeapon(),
@@ -27,34 +39,6 @@ export class Game {
         return weaponList[Math.floor(Math.random() * weaponList.length)];
     }
 
-    init() {
-        const playerMaxHealth = 10;
-        const playerCurrentHealth = 10;
-        const enemyMaxHealth = 10;
-        const enemyCurrentHealth = 10;
-        const playerWeapon = this.getRandomWeapon();
-        const enemyWeapon = null;
-        const hasInit = true;
-        const hasRound = true;
-        const hasFought = false;
-        const playerWon = false;
-        const playerLost = false;
-
-        return {
-            playerMaxHealth,
-            playerCurrentHealth,
-            enemyMaxHealth,
-            enemyCurrentHealth,
-            playerWeapon,
-            enemyWeapon,
-            hasInit,
-            hasRound,
-            hasFought,
-            playerWon,
-            playerLost
-        }
-    }
-
     newRound(hasInit: boolean) {
         if (!hasInit) throw new Error('Game not initialized');
 
@@ -67,14 +51,10 @@ export class Game {
     }
 
     fight(
-        playerHealth: number,
-        enemyHealth: number,
         playerWeapon: Weapon,
-        hasInit: boolean,
         hasRound: boolean,
         hasFought: boolean
     ): Array<number | boolean> {
-        if (!hasInit) throw new Error('Game not initialized');
         if (!hasRound) throw new Error('Round not initialized');
         if (hasFought) throw new Error('Round already played');
 
@@ -87,36 +67,36 @@ export class Game {
         enemyDamages += enemyWeapon.getDamage();
 
         if (playerDamages === enemyDamages) {
-            return [playerHealth, enemyHealth];
+            return [this.playerCurrentHealth, this.enemyCurrentHealth];
         }
 
         if (playerDamages > enemyDamages) {
-            enemyHealth -= playerDamages - enemyDamages;
+            this.enemyCurrentHealth -= playerDamages - enemyDamages;
         } else {
-            playerHealth -= enemyDamages - playerDamages;
+            this.playerCurrentHealth -= enemyDamages - playerDamages;
         }
 
         // health cannot be negative
-        if (playerHealth <= 0) {
-            playerHealth = 0;
+        if (this.playerCurrentHealth <= 0) {
+            this.playerCurrentHealth = 0;
         }
 
         // health cannot be negative
-        if (enemyHealth <= 0) {
-            enemyHealth = 0;
+        if (this.enemyCurrentHealth <= 0) {
+            this.enemyCurrentHealth = 0;
         }
 
         // check if the game is over and the player has won
-        if (enemyHealth === 0) {
-            return [playerHealth, enemyHealth, enemyWeapon, true, true, false];
+        if (this.enemyCurrentHealth === 0) {
+            return [this.playerCurrentHealth, this.enemyCurrentHealth, enemyWeapon, true, true, false];
         }
 
 
         // check if the game is over and the player has lost
-        if (playerHealth === 0) {
-            return [playerHealth, enemyHealth, enemyWeapon, true, false, true];
+        if (this.playerCurrentHealth === 0) {
+            return [this.playerCurrentHealth, this.enemyCurrentHealth, enemyWeapon, true, false, true];
         }
 
-        return [playerHealth, enemyHealth, enemyWeapon, true, false, false];
+        return [this.playerCurrentHealth, this.enemyCurrentHealth, enemyWeapon, true, false, false];
     }
 }
