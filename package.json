@@ -1,6 +1,22 @@
 {
 	"name": "cleancode-js-devoir",
 	"version": "0.0.1",
+	"jest": {
+		"preset": "ts-jest",
+		"testEnvironment": "node",
+		"moduleFileExtensions": [
+			"ts",
+			"tsx",
+			"js",
+			"jsx",
+			"json",
+			"node"
+		],
+		"testMatch": [
+			"**/__tests__/**/*.[jt]s?(x)",
+			"**/?(*.)+(spec|test).[jt]s?(x)"
+		]
+	},
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -10,7 +26,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"test:watch": "jest --watch"
 	},
 	"devDependencies": {
 		"@skeletonlabs/skeleton": "^2.10.2",
@@ -19,19 +36,25 @@
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@tailwindcss/typography": "^0.5.14",
+		"@testing-library/jest-dom": "^6.5.0",
+		"@testing-library/svelte": "^5.2.3",
 		"@types/eslint": "^9.6.0",
+		"@types/jest": "^29.5.13",
 		"@types/node": "^22.7.4",
 		"autoprefixer": "^10.4.20",
 		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.36.0",
 		"globals": "^15.0.0",
+		"jest": "^29.7.0",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
 		"prettier-plugin-tailwindcss": "^0.6.5",
 		"svelte": "^4.2.7",
 		"svelte-check": "^4.0.0",
+		"svelte-jester": "^5.0.0",
 		"tailwindcss": "^3.4.9",
+		"ts-jest": "^29.2.5",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.0.0",
 		"vite": "^5.0.3",
